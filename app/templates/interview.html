@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% from "macros/form.html" import csrf_field %}
+{% block content %}
+<section class="coverage-bar">
+  <div class="coverage-stats">
+    <span class="stat completed">Completed: {{ coverage.completed }}</span>
+    <span class="stat missing">Missing: {{ coverage.missing }}</span>
+    <span class="stat unknown">Unknown: {{ coverage.unknown }}</span>
+    <span class="stat na">N/A: {{ coverage.not_applicable }}</span>
+    <span class="stat pct">{{ coverage.percent_complete }}% resolved</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" style="width: {{ coverage.percent_complete }}%"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Interview round {{ round_number }}</h2>
+  <p class="lead">Each question explains why we need the answer and shows examples of good responses.</p>
+
+  <form method="post" action="{{ base_path }}/interview">
+    {{ csrf_field() }}
+    {% for q in questions %}
+    {% set field_key = q.question_id ~ '::' ~ (q.applies_to or '') %}
+    <article class="question-card" id="q-{{ field_key | replace('::', '-') }}">
+      <div class="question-header">
+        <img src="/static/graphics/{{ graphics.get(q.section, 'company.svg') }}" alt="" class="section-graphic" width="48" height="48">
+        <div>
+          <span class="section-badge">{{ section_titles.get(q.section, q.section) }}</span>
+          {% if q.applies_to %}<span class="app-badge">{{ q.applies_to }}</span>{% endif %}
+        </div>
+      </div>
+
+      <h3 class="question-text">{{ q.question }}</h3>
+
+      <div class="reason-box">
+        <strong>Why we ask</strong>
+        <p>{{ q.reason }}</p>
+      </div>
+
+      {% if q.examples %}
+      <div class="examples-box">
+        <strong>What a good answer looks like</strong>
+        <ul>
+          {% for ex in q.examples %}
+          <li>{{ ex }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if q.evidence_requested %}
+      <div class="evidence-box">
+        <strong>Evidence we may request</strong>
+        <ul>
+          {% for ev in q.evidence_requested %}
+          <li>{{ ev }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="answer-area">
+        {% if q.answer_type == 'single_select' or q.answer_type == 'yes_no' %}
+        <select name="q__{{ field_key }}">
+          <option value="">Select…</option>
+          {% for opt in q.options %}
+          <option value="{{ opt }}">{{ opt }}</option>
+          {% endfor %}
+          {% if q.answer_type == 'yes_no' %}
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          {% endif %}
+        </select>
+        {% elif q.answer_type == 'multi_select' %}
+        <fieldset>
+          {% for opt in q.options %}
+          <label class="checkbox">
+            <input type="checkbox" name="q__{{ field_key }}" value="{{ opt }}"> {{ opt }}
+          </label>
+          {% endfor %}
+        </fieldset>
+        {% elif q.answer_type == 'number' %}
+        <input type="number" name="q__{{ field_key }}">
+        {% else %}
+        <textarea name="q__{{ field_key }}" rows="3" placeholder="Your answer…"></textarea>
+        {% endif %}
+      </div>
+
+      <div class="status-row">
+        <label class="radio-inline">
+          <input type="radio" name="status__{{ field_key }}" value="answered" checked> Answer provided
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="status__{{ field_key }}" value="unknown"> Unknown
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="status__{{ field_key }}" value="not_applicable"> Not applicable
+        </label>
+      </div>
+
+      <label class="notes-label">Additional notes (free form)
+        <textarea name="notes__{{ field_key }}" rows="2" placeholder="Extra context, links to evidence, caveats…"></textarea>
+      </label>
+    </article>
+    {% endfor %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary">Submit round &amp; continue</button>
+    </div>
+  </form>
+  <form method="post" action="{{ base_path }}/interview/generate-plan" class="form-actions mt">
+    {{ csrf_field() }}
+    <button type="submit" class="btn secondary">Generate plan now (even with gaps)</button>
+  </form>
+</section>
+{% endblock %}

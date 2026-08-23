@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "macros/form.html" import csrf_field %}
+{% block content %}
+<section class="card">
+  <h2>Retrieve your submission</h2>
+  <p class="lead">Enter the retrieval key from your approved assessment plan PDF or approval screen.</p>
+  {% if error %}
+  <p class="error-banner">{{ error }}</p>
+  {% endif %}
+  <form method="post" action="/retrieve">
+    {{ csrf_field() }}
+    <label>Access key
+      <input type="text" name="access_key" required placeholder="Paste your retrieval key">
+    </label>
+    <button type="submit" class="btn primary">Continue</button>
+  </form>
+  <p class="mt"><a href="/">Start a new discovery session</a></p>
+</section>
+{% endblock %}

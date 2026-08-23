@@ -1,0 +1,86 @@
+<article class="plan-report">
+  <header class="plan-cover">
+    <h3>{{ plan_dict.company.name or "Company" }}</h3>
+    <p class="plan-products">Products: {{ company_products or products or "—" }}</p>
+    {% if plan_dict.company.name %}
+    <p class="plan-meta"><strong>Company:</strong> {{ plan_dict.company.name }}</p>
+    {% endif %}
+    <p class="plan-meta"><strong>Industry:</strong> {{ plan_dict.company.industry or "—" }}</p>
+    <p class="plan-meta"><strong>Compliance:</strong> {{ plan_dict.company.compliance or "—" }}</p>
+    <p class="plan-meta"><strong>Risk tolerance:</strong> {{ plan_dict.company.risk_tolerance or "—" }}</p>
+  </header>
+
+  <section class="plan-section">
+    <h4>Coverage summary</h4>
+    <ul class="plan-list">
+      <li>Completed: {{ plan_dict.coverage_summary.completed }}</li>
+      <li>Missing: {{ plan_dict.coverage_summary.missing }}</li>
+      <li>Unknown: {{ plan_dict.coverage_summary.unknown }}</li>
+      <li>Not applicable: {{ plan_dict.coverage_summary.not_applicable }}</li>
+      <li>Resolved: {{ plan_dict.coverage_summary.percent_complete }}%</li>
+    </ul>
+  </section>
+
+  <section class="plan-section">
+    <h4>Objectives</h4>
+    <p><strong>Primary goal:</strong> {{ plan_dict.objectives.primary_goal or "—" }}</p>
+    <p><strong>Report audiences:</strong> {{ plan_dict.objectives.report_audiences | join(", ") if plan_dict.objectives.report_audiences else "—" }}</p>
+    <p><strong>Release blockers:</strong> {{ plan_dict.objectives.release_blockers | join(", ") if plan_dict.objectives.release_blockers else "—" }}</p>
+  </section>
+
+  <section class="plan-section">
+    <h4>Applications</h4>
+    {% if plan_dict.applications %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Application</th>
+          <th>Criticality</th>
+          <th>Exposure</th>
+          <th>Data classes</th>
+          <th>Repositories</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in plan_dict.applications %}
+        <tr>
+          <td>{{ app.application }}</td>
+          <td>{{ app.criticality }}</td>
+          <td>{{ app.exposure }}</td>
+          <td>{{ app.data_classes }}</td>
+          <td>{{ app.repositories }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% for app in plan_dict.applications %}
+    <div class="app-plan-detail">
+      <h5>{{ app.application }} — scans &amp; gates</h5>
+      <p><strong>Required scans:</strong> {{ app.required_scans | join(", ") }}</p>
+      <p><strong>Release gates:</strong> critical security {{ app.release_gates.critical_security_findings }}, high security {{ app.release_gates.high_security_findings }}</p>
+      <p><strong>Remediation SLA:</strong> critical {{ app.remediation_sla.critical }}, high {{ app.remediation_sla.high }}, medium {{ app.remediation_sla.medium }}</p>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No applications registered.</p>
+    {% endif %}
+  </section>
+
+  <section class="plan-section">
+    <h4>Exception policy</h4>
+    <p>Approval roles: {{ plan_dict.exceptions.approval_roles | join(", ") }}</p>
+    <p>Maximum duration: {{ plan_dict.exceptions.maximum_duration_days }} days</p>
+    <p>Compensating control required: {{ plan_dict.exceptions.compensating_control_required }}</p>
+  </section>
+
+  {% if plan_dict.missing_information_register %}
+  <section class="plan-section">
+    <h4>Missing information register</h4>
+    <ul class="plan-list">
+      {% for item in plan_dict.missing_information_register %}
+      <li>{{ item.question_id }}{% if item.applies_to %} ({{ item.applies_to }}){% endif %}{% if item.notes %} — {{ item.notes }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</article>

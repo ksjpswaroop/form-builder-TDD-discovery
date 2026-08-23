@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "macros/form.html" import csrf_field %}
+{% block content %}
+<section class="card">
+  <h2>Admin login</h2>
+  {% if error %}
+  <p class="error-banner">{{ error }}</p>
+  {% endif %}
+  <form method="post" action="/admin/login">
+    {{ csrf_field() }}
+    <label>Username <input type="text" name="username" required></label>
+    <label>Password <input type="password" name="password" required></label>
+    <button type="submit" class="btn primary">Sign in</button>
+  </form>
+</section>
+{% endblock %}

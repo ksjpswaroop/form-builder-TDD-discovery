@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "macros/form.html" import select_field, checkbox_group, csrf_field %}
+{% block content %}
+<section class="card">
+  <h2>Application inventory</h2>
+  <p class="lead">Register each application to assess. One application may span multiple repositories.</p>
+
+  {% if applications %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Criticality</th>
+        <th>Exposure</th>
+        <th>Data</th>
+        <th>Repos</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>{{ app.name }}</td>
+        <td>{{ app.criticality }}</td>
+        <td>{{ app.exposure }}</td>
+        <td>{{ app.data_classes }}</td>
+        <td>{{ app.repositories }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <h3>Add application</h3>
+  <form method="post" action="{{ base_path }}/applications" class="grid-form">
+    {{ csrf_field() }}
+    <label>Name <input type="text" name="name" required></label>
+    <label>Description <input type="text" name="description"></label>
+    <label>Business owner <input type="text" name="business_owner"></label>
+    <label>Technical owner <input type="text" name="technical_owner"></label>
+    <label>Repositories <input type="text" name="repositories" placeholder="github.com/org/repo"></label>
+    {{ select_field("Production status", "production_status", production_status_options) }}
+    {{ select_field("Exposure", "exposure", exposure_options) }}
+    {{ checkbox_group("Data classes", "data_classes", data_class_options) }}
+    {{ select_field("Criticality", "criticality", criticality_options) }}
+    {{ select_field("User count", "user_count", user_count_options) }}
+    <button type="submit" class="btn">Add application</button>
+  </form>
+
+  {% if applications %}
+  <form method="post" action="{{ base_path }}/applications/done" class="mt">
+    {{ csrf_field() }}
+    <button type="submit" class="btn primary">Start adaptive interview</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

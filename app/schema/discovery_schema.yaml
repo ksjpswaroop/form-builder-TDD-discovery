@@ -1,0 +1,412 @@
+sections:
+  - id: company_context
+    title: Company and Business Context
+    graphic: company.svg
+  - id: application_inventory
+    title: Application Inventory
+    graphic: applications.svg
+  - id: source_code
+    title: Source Code Profile
+    graphic: source.svg
+  - id: architecture
+    title: Architecture and Dependencies
+    graphic: architecture.svg
+  - id: security
+    title: Security Context
+    graphic: security.svg
+  - id: delivery
+    title: Delivery and Operations
+    graphic: delivery.svg
+  - id: testing
+    title: Testing and Quality
+    graphic: testing.svg
+  - id: technical_debt
+    title: Existing Technical Debt
+    graphic: debt.svg
+  - id: governance
+    title: Governance and Compliance
+    graphic: governance.svg
+  - id: outcomes
+    title: Desired Outcomes
+    graphic: outcomes.svg
+
+fields:
+  - id: CO-INDUSTRY
+    section: company_context
+    question: What industry does the company operate in?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Financial services / banking"
+      - "Healthcare SaaS"
+      - "E-commerce marketplace"
+
+  - id: CO-SIZE
+    section: company_context
+    question: How large is the engineering organization?
+    answer_type: single_select
+    options:
+      - "1-10 engineers"
+      - "11-50 engineers"
+      - "51-200 engineers"
+      - "200+ engineers"
+    priority: medium
+    risk_if_unknown: low
+    examples:
+      - "51-200 engineers across 4 product teams"
+
+  - id: CO-REVENUE-CRITICAL
+    section: company_context
+    question: Which systems directly affect revenue or customer experience?
+    answer_type: free_text
+    priority: critical
+    risk_if_unknown: high
+    examples:
+      - "Payment gateway, customer portal, mobile app"
+      - "Order processing API and checkout service"
+
+  - id: CO-RISK-TOLERANCE
+    section: company_context
+    question: What is the company's risk tolerance for production changes?
+    answer_type: single_select
+    options:
+      - "Move fast, accept higher risk"
+      - "Balanced risk and velocity"
+      - "Conservative, regulated environment"
+      - "Zero tolerance for production incidents"
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Conservative — regulated fintech with SOC 2 obligations"
+
+  - id: CO-COMPLIANCE
+    section: company_context
+    question: Which compliance frameworks apply to the organization?
+    answer_type: multi_select
+    options:
+      - "SOC 2"
+      - "ISO 27001"
+      - "PCI DSS"
+      - "HIPAA"
+      - "NIST"
+      - "GDPR"
+      - "Internal controls only"
+      - "None identified"
+    priority: high
+    risk_if_unknown: high
+    examples:
+      - "SOC 2 Type II and PCI DSS for payment processing"
+
+  - id: APP-CRITICALITY
+    section: application_inventory
+    question: What is the business criticality of this application?
+    answer_type: single_select
+    options:
+      - "Critical — revenue or safety impact"
+      - "High — significant user impact"
+      - "Medium — internal operations"
+      - "Low — experimental or internal tool"
+    priority: critical
+    risk_if_unknown: high
+    applies_to: application
+    examples:
+      - "Critical — handles payment authorization for all customers"
+
+  - id: APP-EXPOSURE
+    section: application_inventory
+    question: How is this application exposed to users or networks?
+    answer_type: single_select
+    options:
+      - "Internet-facing public API or web app"
+      - "Partner or B2B integration"
+      - "Internal only"
+      - "Air-gapped or isolated"
+    priority: critical
+    risk_if_unknown: high
+    applies_to: application
+    examples:
+      - "Internet-facing SaaS portal with 50k monthly active users"
+
+  - id: APP-DATA-CLASSES
+    section: application_inventory
+    question: What categories of sensitive data does this application process?
+    answer_type: multi_select
+    options:
+      - "PII"
+      - "Payment data"
+      - "Health data"
+      - "Credentials / secrets"
+      - "Financial records"
+      - "None sensitive"
+    priority: critical
+    risk_if_unknown: high
+    applies_to: application
+    examples:
+      - "PII (names, emails) and payment card data"
+
+  - id: APP-REPOS
+    section: application_inventory
+    question: Where are the source repositories for this application?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    applies_to: application
+    examples:
+      - "github.com/org/customer-portal (monorepo)"
+      - "gitlab.com/team/api-service and infra/terraform"
+
+  - id: SRC-LANGUAGES
+    section: source_code
+    question: What programming languages are used in the codebase?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Python 3.11, TypeScript, Go"
+      - "Java 17 with Spring Boot"
+
+  - id: SRC-FRAMEWORKS
+    section: source_code
+    question: What frameworks and major library versions are in use?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "FastAPI 0.115, React 18, PostgreSQL 15"
+
+  - id: SRC-LEGACY
+    section: source_code
+    question: Are there legacy modules or unsupported technologies?
+    answer_type: yes_no
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Yes — PHP 5.6 billing module scheduled for replacement in Q3"
+
+  - id: ARCH-STYLE
+    section: architecture
+    question: What is the overall architecture style?
+    answer_type: single_select
+    options:
+      - "Monolith"
+      - "Modular monolith"
+      - "Microservices"
+      - "Serverless"
+      - "Mobile or desktop client"
+      - "Embedded"
+      - "Hybrid"
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Modular monolith migrating to microservices for payment flows"
+
+  - id: ARCH-AUTH
+    section: architecture
+    question: How is authentication and authorization implemented?
+    answer_type: free_text
+    priority: critical
+    risk_if_unknown: high
+    examples:
+      - "OAuth 2.0 via Okta with MFA for admin roles"
+      - "JWT tokens with role-based access control"
+
+  - id: SEC-THREAT-MODEL
+    section: security
+    question: What is the primary threat model for this system?
+    answer_type: single_select
+    options:
+      - "Public SaaS — internet attackers"
+      - "Financial system — fraud and insider threat"
+      - "Healthcare — data breach and compliance"
+      - "On-premises enterprise"
+      - "Internal tool — limited exposure"
+      - "Not defined"
+    priority: critical
+    risk_if_unknown: high
+    examples:
+      - "Public SaaS — credential stuffing, API abuse, data exfiltration"
+
+  - id: SEC-SAST-TOOLS
+    section: security
+    question: Which static analysis or security scanning tools are in use?
+    answer_type: multi_select
+    options:
+      - "Semgrep"
+      - "SonarQube"
+      - "CodeQL"
+      - "Snyk"
+      - "GitHub Advanced Security"
+      - "None"
+      - "Unknown"
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Semgrep in CI, Snyk for dependency scanning"
+
+  - id: SEC-SECRET-MGMT
+    section: security
+    question: How are secrets and credentials managed?
+    answer_type: single_select
+    options:
+      - "Dedicated secrets manager (Vault, AWS SM, etc.)"
+      - "Environment variables in CI/CD"
+      - "Config files in repository"
+      - "Mixed approach"
+      - "Unknown"
+    priority: critical
+    risk_if_unknown: high
+    examples:
+      - "HashiCorp Vault with rotation every 90 days"
+
+  - id: DEL-CI-CD
+    section: delivery
+    question: What CI/CD platform is used for builds and deployments?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "GitHub Actions with ArgoCD to Kubernetes"
+      - "GitLab CI deploying to AWS ECS"
+
+  - id: DEL-DEPLOY-FREQ
+    section: delivery
+    question: How frequently are production deployments made?
+    answer_type: single_select
+    options:
+      - "Multiple times per day"
+      - "Daily"
+      - "Weekly"
+      - "Monthly or less"
+      - "Ad hoc / manual"
+    priority: medium
+    risk_if_unknown: low
+    examples:
+      - "Daily releases with automated rollback on failure"
+
+  - id: DEL-MONITORING
+    section: delivery
+    question: What logging and monitoring tools are in production?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Datadog for metrics, Sentry for errors, CloudWatch logs"
+
+  - id: TEST-TYPES
+    section: testing
+    question: What types of automated tests exist?
+    answer_type: multi_select
+    options:
+      - "Unit tests"
+      - "Integration tests"
+      - "End-to-end tests"
+      - "Performance tests"
+      - "Security tests"
+      - "Contract tests"
+      - "Minimal or none"
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Unit and integration in CI; E2E nightly on staging"
+
+  - id: TEST-COVERAGE
+    section: testing
+    question: What is the approximate test coverage on critical paths?
+    answer_type: single_select
+    options:
+      - "Above 80%"
+      - "60-80%"
+      - "40-60%"
+      - "Below 40%"
+      - "Not measured"
+      - "Unknown"
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "75% overall, 90% on payment authorization module"
+
+  - id: DEBT-REGISTER
+    section: technical_debt
+    question: Is there an existing technical debt register or backlog?
+    answer_type: yes_no
+    priority: medium
+    risk_if_unknown: low
+    examples:
+      - "Yes — Jira epic TECH-DEBT with 45 tracked items"
+
+  - id: DEBT-KNOWN-ISSUES
+    section: technical_debt
+    question: What are the most significant known debt or modernization needs?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Legacy auth module, unsupported Log4j in reporting service"
+
+  - id: GOV-AUDIT
+    section: governance
+    question: What audit or evidence requirements apply to code changes?
+    answer_type: free_text
+    priority: high
+    risk_if_unknown: high
+    examples:
+      - "SOC 2 change management evidence retained 3 years"
+
+  - id: GOV-OPEN-SOURCE
+    section: governance
+    question: Is there a policy for open-source and third-party dependency usage?
+    answer_type: yes_no
+    priority: medium
+    risk_if_unknown: medium
+    examples:
+      - "Yes — approved license list and legal review for new dependencies"
+
+  - id: OUT-PRIMARY-GOAL
+    section: outcomes
+    question: What is the primary goal of this assessment?
+    answer_type: single_select
+    options:
+      - "Establish a debt baseline"
+      - "Reduce vulnerabilities"
+      - "Prepare for audit"
+      - "Modernize legacy application"
+      - "Evaluate acquisition target"
+      - "Improve engineering velocity"
+      - "Establish release gates"
+      - "Continuous monitoring"
+    priority: critical
+    risk_if_unknown: high
+    examples:
+      - "Prepare for SOC 2 audit and establish release gates"
+
+  - id: OUT-REPORT-AUDIENCE
+    section: outcomes
+    question: Who will consume the assessment reports?
+    answer_type: multi_select
+    options:
+      - "CTO / engineering leadership"
+      - "Security team"
+      - "Developers"
+      - "Compliance / audit"
+      - "Board or executives"
+      - "External auditors"
+    priority: high
+    risk_if_unknown: medium
+    examples:
+      - "Security team for remediation backlog; CTO for executive summary"
+
+  - id: OUT-RELEASE-BLOCKERS
+    section: outcomes
+    question: Which finding severities should block a production release?
+    answer_type: multi_select
+    options:
+      - "Critical security"
+      - "High security"
+      - "Critical quality/debt"
+      - "High quality/debt"
+      - "None — advisory only"
+    priority: critical
+    risk_if_unknown: high
+    examples:
+      - "Critical and high security findings block release"

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin — Session {{ record.id }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Session {{ record.id }} — {{ record.company_name }}</h1>
+    <nav class="step-nav">
+      <a href="/admin/sessions">All sessions</a>
+      <a href="/k/{{ record.access_key }}/plan" target="_blank">Public plan view</a>
+    </nav>
+    <p class="security-badge" aria-label="Secured">Your information is secured</p>
+  </header>
+  <main class="container">
+    <section class="card">
+      <h2>Details</h2>
+      <p><strong>Access key:</strong> <code id="masked-key">{{ record.access_key[:8] }}…</code>
+        <button type="button" class="btn" id="reveal-key-btn">Reveal</button>
+        <span id="full-key" hidden>{{ record.access_key }}</span>
+      </p>
+      <p><strong>Products:</strong> {{ record.products }}</p>
+      <p><strong>Approved:</strong> {{ record.plan_approved }} {% if record.approved_at %}({{ record.approved_at }}){% endif %}</p>
+      <p><strong>PDF:</strong> {{ record.pdf_path or "—" }}</p>
+      <p><strong>Excel:</strong> {{ record.excel_path or "—" }}</p>
+      <p><strong>JSON:</strong> {{ record.json_path or "—" }}</p>
+
+      <form method="post" action="/admin/sessions/{{ record.id }}/update" class="grid-form mt">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Company name <input type="text" name="company_name" value="{{ state.company.company_name }}"></label>
+        <label>Products <input type="text" name="products" value="{{ state.company.products }}"></label>
+        <label>Industry <input type="text" name="industry" value="{{ state.company.industry }}"></label>
+        <label>Primary goal <input type="text" name="primary_goal" value="{{ state.objectives.primary_goal }}"></label>
+        <button type="submit" class="btn">Save changes</button>
+      </form>
+
+      <form method="post" action="/admin/sessions/{{ record.id }}/regenerate" class="mt">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="btn primary">Regenerate documents</button>
+      </form>
+
+      {% if record.pdf_path %}
+      <div class="download-actions mt">
+        <a href="/k/{{ record.access_key }}/documents/pdf" class="btn">Download PDF</a>
+        <a href="/k/{{ record.access_key }}/documents/xlsx" class="btn">Download Excel</a>
+        <a href="/k/{{ record.access_key }}/documents/json" class="btn">Download JSON</a>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+  <script>
+    document.getElementById('reveal-key-btn')?.addEventListener('click', function () {
+      var full = document.getElementById('full-key');
+      var masked = document.getElementById('masked-key');
+      if (full && masked) {
+        masked.textContent = full.textContent;
+        this.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

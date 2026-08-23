@@ -1,0 +1,27 @@
+{% macro csrf_field() %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{% endmacro %}
+
+{% macro select_field(label, name, options, selected='', required=false) %}
+<label>{{ label }}
+  <select name="{{ name }}"{% if required %} required{% endif %}>
+    <option value="">Select…</option>
+    {% for opt in options %}
+    <option value="{{ opt }}"{% if selected == opt %} selected{% endif %}>{{ opt }}</option>
+    {% endfor %}
+  </select>
+</label>
+{% endmacro %}
+
+{% macro checkbox_group(legend, name, options, selected=[]) %}
+<fieldset>
+  <legend>{{ legend }}</legend>
+  {% for opt in options %}
+  <label class="checkbox">
+    <input type="checkbox" name="{{ name }}" value="{{ opt }}"
+      {% if opt in selected %}checked{% endif %}>
+    {{ opt }}
+  </label>
+  {% endfor %}
+</fieldset>
+{% endmacro %}

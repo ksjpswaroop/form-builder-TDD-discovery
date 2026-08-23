@@ -1,0 +1,26 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local runtime data
+data/sessions.db
+data/documents/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

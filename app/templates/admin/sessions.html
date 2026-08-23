@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin — Sessions</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Admin — Discovery Sessions</h1>
+    <nav class="step-nav">
+      <form method="post" action="/admin/logout" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="btn">Logout</button>
+      </form>
+    </nav>
+    <p class="security-badge" aria-label="Secured">Your information is secured</p>
+  </header>
+  <main class="container">
+    <section class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Company</th>
+            <th>Products</th>
+            <th>Step</th>
+            <th>Approved</th>
+            <th>Key</th>
+            <th>Documents</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
+          <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.company_name }}</td>
+            <td>{{ s.products }}</td>
+            <td>{{ s.current_step }}</td>
+            <td>{{ "Yes" if s.plan_approved else "No" }}</td>
+            <td><code>{{ s.access_key[:8] }}…</code></td>
+            <td>{{ s.documents_generated_at or "—" }}</td>
+            <td><a href="/admin/sessions/{{ s.id }}">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

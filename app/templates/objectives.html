@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "macros/form.html" import select_field, checkbox_group, csrf_field %}
+{% block content %}
+<section class="card">
+  <h2>Assessment objectives</h2>
+  <p class="lead">What should this discovery produce? This drives question priority and report format.</p>
+  <form method="post" action="{{ base_path }}/objectives">
+    {{ csrf_field() }}
+    {{ select_field("Primary goal", "primary_goal", goal_options, objectives.primary_goal, true) }}
+    {{ checkbox_group("Report audiences", "report_audiences", audience_options, objectives.report_audiences) }}
+    {{ checkbox_group("Release blockers", "release_blockers", blocker_options, objectives.release_blockers) }}
+    {{ select_field("Assessment frequency", "assessment_frequency", frequency_options, objectives.assessment_frequency) }}
+    {{ select_field("Remediation capacity", "remediation_capacity", capacity_options, objectives.remediation_capacity) }}
+    <button type="submit" class="btn primary">Continue to applications</button>
+  </form>
+</section>
+{% endblock %}

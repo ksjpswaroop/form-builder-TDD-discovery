@@ -1,0 +1,23 @@
+[project]
+name = "form-builder-tdd-discovery"
+version = "0.1.0"
+description = "Adaptive technical-debt discovery form with local Ollama"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlmodel>=0.0.22",
+    "httpx>=0.27.0",
+    "jinja2>=3.1.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "pyyaml>=6.0.0",
+    "python-multipart>=0.0.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.0", "pytest-asyncio>=0.24.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
