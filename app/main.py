@@ -34,6 +34,7 @@ from app.form_options import (
 )
 from app.http_helpers import render_page
 from app.middleware.security import SecurityHeadersMiddleware
+from app.middleware.strip_prefix import StripPrefixMiddleware
 from app.schemas import (
     AnswerRecord,
     AnswerStatus,
@@ -83,6 +84,8 @@ app = FastAPI(
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+if settings.root_path:
+    app.add_middleware(StripPrefixMiddleware, prefix=settings.root_path)
 app.add_middleware(SecurityHeadersMiddleware)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
