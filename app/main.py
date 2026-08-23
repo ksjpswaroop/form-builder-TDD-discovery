@@ -124,6 +124,61 @@ def _ctx(access_key: str, **kwargs) -> dict:
     return {"access_key": access_key, "base_path": _url(f"/k/{access_key}"), **kwargs}
 
 
+def _render_intake(
+    request: Request,
+    access_key: str,
+    company: CompanyIntake,
+    *,
+    error: str | None = None,
+    status_code: int = 200,
+):
+    return render_page(
+        request,
+        "intake.html",
+        _ctx(
+            access_key,
+            company=company,
+            step="intake",
+            error=error,
+            industry_options=INDUSTRY_OPTIONS,
+            engineering_size_options=ENGINEERING_SIZE_OPTIONS,
+            country_options=COUNTRY_OPTIONS,
+            compliance_options=COMPLIANCE_OPTIONS,
+            tooling_options=TOOLING_OPTIONS,
+            risk_tolerance_options=RISK_TOLERANCE_OPTIONS,
+            selected_compliance=split_multi_value(company.compliance),
+            selected_tooling=split_multi_value(company.tooling),
+        ),
+        status_code=status_code,
+    )
+
+
+def _render_objectives(
+    request: Request,
+    access_key: str,
+    objectives: AssessmentObjectives,
+    *,
+    error: str | None = None,
+    status_code: int = 200,
+):
+    return render_page(
+        request,
+        "objectives.html",
+        _ctx(
+            access_key,
+            objectives=objectives,
+            step="objectives",
+            error=error,
+            goal_options=PRIMARY_GOAL_OPTIONS,
+            audience_options=REPORT_AUDIENCE_OPTIONS,
+            blocker_options=RELEASE_BLOCKER_OPTIONS,
+            frequency_options=ASSESSMENT_FREQUENCY_OPTIONS,
+            capacity_options=REMEDIATION_CAPACITY_OPTIONS,
+        ),
+        status_code=status_code,
+    )
+
+
 @app.get("/")
 def home(db: Session = Depends(get_db)):
     record, _ = create_session(db)
@@ -160,23 +215,7 @@ def retrieve_submit(
 @app.get("/k/{access_key}/intake")
 def intake_page(request: Request, access_key: str, db: Session = Depends(get_db)):
     record, state = _get_by_key(db, access_key)
-    return render_page(
-        request,
-        "intake.html",
-        _ctx(
-            access_key,
-            company=state.company,
-            step="intake",
-            industry_options=INDUSTRY_OPTIONS,
-            engineering_size_options=ENGINEERING_SIZE_OPTIONS,
-            country_options=COUNTRY_OPTIONS,
-            compliance_options=COMPLIANCE_OPTIONS,
-            tooling_options=TOOLING_OPTIONS,
-            risk_tolerance_options=RISK_TOLERANCE_OPTIONS,
-            selected_compliance=split_multi_value(state.company.compliance),
-            selected_tooling=split_multi_value(state.company.tooling),
-        ),
-    )
+    return _render_intake(request, access_key, state.company)
 
 
 @app.post("/k/{access_key}/intake")
@@ -196,8 +235,8 @@ def intake_submit(
 ):
     validate_csrf(request, csrf_token)
     record, state = _get_by_key(db, access_key)
-    state.company = CompanyIntake(
-        company_name=company_name,
+    submitted_company = CompanyIntake(
+        company_name=company_name.strip(),
         industry=industry,
         engineering_size=engineering_size,
         products=products,
@@ -206,6 +245,16 @@ def intake_submit(
         tooling=", ".join(tooling),
         risk_tolerance=risk_tolerance,
     )
+    if not submitted_company.company_name:
+        return _render_intake(
+            request,
+            access_key,
+            submitted_company,
+            error="Company name is required.",
+            status_code=400,
+        )
+
+    state.company = submitted_company
     save_session_state(db, record, state, step="objectives")
     return RedirectResponse(url=_url(f"/k/{access_key}/objectives"), status_code=303)
 
@@ -213,20 +262,7 @@ def intake_submit(
 @app.get("/k/{access_key}/objectives")
 def objectives_page(request: Request, access_key: str, db: Session = Depends(get_db)):
     record, state = _get_by_key(db, access_key)
-    return render_page(
-        request,
-        "objectives.html",
-        _ctx(
-            access_key,
-            objectives=state.objectives,
-            step="objectives",
-            goal_options=PRIMARY_GOAL_OPTIONS,
-            audience_options=REPORT_AUDIENCE_OPTIONS,
-            blocker_options=RELEASE_BLOCKER_OPTIONS,
-            frequency_options=ASSESSMENT_FREQUENCY_OPTIONS,
-            capacity_options=REMEDIATION_CAPACITY_OPTIONS,
-        ),
-    )
+    return _render_objectives(request, access_key, state.objectives)
 
 
 @app.post("/k/{access_key}/objectives")
@@ -243,13 +279,23 @@ def objectives_submit(
 ):
     validate_csrf(request, csrf_token)
     record, state = _get_by_key(db, access_key)
-    state.objectives = AssessmentObjectives(
-        primary_goal=primary_goal,
+    submitted_objectives = AssessmentObjectives(
+        primary_goal=primary_goal.strip(),
         report_audiences=report_audiences,
         release_blockers=release_blockers,
         assessment_frequency=assessment_frequency,
         remediation_capacity=remediation_capacity,
     )
+    if not submitted_objectives.primary_goal:
+        return _render_objectives(
+            request,
+            access_key,
+            submitted_objectives,
+            error="Primary goal is required.",
+            status_code=400,
+        )
+
+    state.objectives = submitted_objectives
     save_session_state(db, record, state, step="applications")
     return RedirectResponse(url=_url(f"/k/{access_key}/applications"), status_code=303)
 

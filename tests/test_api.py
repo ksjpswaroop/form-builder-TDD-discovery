@@ -34,6 +34,74 @@ def test_intake_flow(client):
     assert "objectives" in response.headers["location"]
 
 
+def test_intake_requires_company_name_and_preserves_submission(client, db_engine):
+    access_key = _start_session(client)
+    response = post_form(
+        client,
+        f"/k/{access_key}/intake",
+        data={
+            "company_name": "   ",
+            "industry": "SaaS / technology",
+            "engineering_size": "11-50 engineers",
+            "products": "Analytics platform",
+            "countries": "United States",
+            "compliance": ["SOC 2", "PCI DSS"],
+            "tooling": ["GitHub Actions"],
+            "risk_tolerance": "Balanced risk and velocity",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 400
+    assert "Company name is required." in response.text
+    assert "Analytics platform" in response.text
+    assert "SaaS / technology\" selected" in response.text
+    assert 'name="compliance" value="SOC 2"' in response.text
+    assert 'name="tooling" value="GitHub Actions"' in response.text
+
+    with Session(db_engine) as db:
+        record, state = load_session_by_access_key(db, access_key)
+        assert record.current_step == "intake"
+        assert state.company.company_name == ""
+
+
+def test_objectives_require_primary_goal_and_preserve_submission(client, db_engine):
+    access_key = _start_session(client)
+    post_form(
+        client,
+        f"/k/{access_key}/intake",
+        data={
+            "company_name": "Test Co",
+            "industry": "SaaS / technology",
+            "engineering_size": "11-50 engineers",
+        },
+    )
+
+    response = post_form(
+        client,
+        f"/k/{access_key}/objectives",
+        data={
+            "primary_goal": "   ",
+            "report_audiences": ["Security team"],
+            "release_blockers": ["Critical security"],
+            "assessment_frequency": "Weekly",
+            "remediation_capacity": "1 engineer part-time",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 400
+    assert "Primary goal is required." in response.text
+    assert 'name="report_audiences" value="Security team"' in response.text
+    assert 'name="release_blockers" value="Critical security"' in response.text
+    assert "Weekly\" selected" in response.text
+
+    with Session(db_engine) as db:
+        record, state = load_session_by_access_key(db, access_key)
+        assert record.current_step == "objectives"
+        assert state.objectives.primary_goal == ""
+
+
 def test_interview_page_has_reason_and_examples(client):
     access_key = _full_session_to_interview(client)
     response = client.get(f"/k/{access_key}/interview")
