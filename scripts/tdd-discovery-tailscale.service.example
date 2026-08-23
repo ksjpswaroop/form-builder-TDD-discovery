@@ -1,0 +1,22 @@
+[Unit]
+Description=TDD Discovery Form Tailscale (userspace + Funnel)
+After=network-online.target discovery-form.service
+Wants=discovery-form.service network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Environment=TS_VAR_ROOT=/home/piren/.local/tailscale-tdd-discovery
+ExecStart=/home/piren/.local/tailscale/tailscaled \
+  --tun=userspace-networking \
+  --statedir=/home/piren/.local/tailscale-tdd-discovery \
+  --state=/home/piren/.local/tailscale-tdd-discovery/tailscaled.state \
+  --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock
+ExecStartPost=/bin/bash -c 'for i in $(seq 1 60); do /home/piren/.local/tailscale/tailscale --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock status --json 2>/dev/null | grep -q "\"BackendState\": \"Running\"" && break; sleep 1; done; /home/piren/.local/tailscale/tailscale --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock funnel --yes --bg http://127.0.0.1:8000'
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
