@@ -80,7 +80,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="TDD Discovery Form",
     lifespan=lifespan,
-    root_path=settings.root_path or "",
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
