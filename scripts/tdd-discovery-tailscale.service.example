@@ -12,7 +12,7 @@ ExecStart=/home/piren/.local/tailscale/tailscaled \
   --statedir=/home/piren/.local/tailscale-tdd-discovery \
   --state=/home/piren/.local/tailscale-tdd-discovery/tailscaled.state \
   --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock
-ExecStartPost=/bin/bash -c 'for i in $(seq 1 60); do /home/piren/.local/tailscale/tailscale --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock status --json 2>/dev/null | grep -q "\"BackendState\": \"Running\"" && break; sleep 1; done; /home/piren/.local/tailscale/tailscale --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock funnel --yes --bg http://127.0.0.1:8000'
+ExecStartPost=/bin/bash -c 'for i in $(seq 1 60); do /home/piren/.local/tailscale/tailscale --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock status --json 2>/dev/null | python3 -c "import sys,json; exit(0 if json.load(sys.stdin).get(\"BackendState\")==\"Running\" else 1)" && break; sleep 1; done; /home/piren/.local/tailscale/tailscale --socket=/home/piren/.local/tailscale-tdd-discovery/tailscaled.sock funnel --yes --bg http://127.0.0.1:8000'
 Restart=always
 RestartSec=5
 StandardOutput=journal
