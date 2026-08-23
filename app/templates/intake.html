@@ -1,42 +1,41 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import select_field, checkbox_group, csrf_field, text_field, textarea_field %}
-{% from "macros/cards.html" import section_card, info_card %}
+{% from "macros/layout.html" import page_hero, form_section, form_footer, submit_row %}
 {% block content %}
-<article class="card wizard-card wizard-card--hero">
-  <div class="card-hero">
-    <div class="card-hero-content">
-      <span class="step-badge step-badge-1">Step 1</span>
-      <h2>Business Details</h2>
-      <p class="lead">Tell us about your organization so we can tailor the discovery interview.</p>
+{{ page_hero('intake') }}
+
+<form class="form" method="post" action="{{ base_path }}/intake" novalidate>
+  {{ csrf_field() }}
+
+  {% call form_section('01', 'Organization', 'Core company information used to calibrate the interview.', 'building') %}
+    {{ text_field('Company name', 'company_name', company.company_name, true, 'text', 'e.g. Northwind Capital') }}
+    <div class="field-grid">
+      {{ select_field('Industry', 'industry', industry_options, company.industry) }}
+      {{ select_field('Engineering team size', 'engineering_size', engineering_size_options, company.engineering_size) }}
     </div>
-    <div class="card-hero-art" aria-hidden="true"></div>
+    {{ textarea_field('Products & services', 'products', company.products, 3, 'Helps us pick the right follow-up questions about your domain.') }}
+  {% endcall %}
+
+  {% call form_section('02', 'Operations & risk', 'Where you operate and how you approach change.', 'globe') %}
+    <div class="field-grid">
+      {{ select_field('Primary regions', 'countries', country_options, company.countries) }}
+      {{ select_field('Risk tolerance', 'risk_tolerance', risk_tolerance_options, company.risk_tolerance) }}
+    </div>
+  {% endcall %}
+
+  {% call form_section('03', 'Compliance & tooling', 'Select everything that applies — multiple is fine.', 'shield') %}
+    {{ checkbox_group('Compliance frameworks', 'compliance', compliance_options, selected_compliance) }}
+    {{ checkbox_group('Existing tooling', 'tooling', tooling_options, selected_tooling) }}
+  {% endcall %}
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </span>
+    <span>Your answers shape which security and debt questions appear in the interview.</span>
   </div>
 
-  <form method="post" action="{{ base_path }}/intake" class="wizard-form">
-    {{ csrf_field() }}
-
-    {% call section_card("Organization", "Core company information", "indigo") %}
-      {{ text_field("Company name", "company_name", company.company_name, true) }}
-      {{ select_field("Industry", "industry", industry_options, company.industry) }}
-      {{ select_field("Engineering team size", "engineering_size", engineering_size_options, company.engineering_size) }}
-      {{ textarea_field("Products and services", "products", company.products, 3) }}
-    {% endcall %}
-
-    {% call section_card("Operations & risk", "Where you operate and how you approach risk", "teal") %}
-      {{ select_field("Primary countries of operation", "countries", country_options, company.countries) }}
-      {{ select_field("Risk tolerance", "risk_tolerance", risk_tolerance_options, company.risk_tolerance) }}
-    {% endcall %}
-
-    {% call section_card("Compliance & tooling", "Select all frameworks and tools that apply", "violet") %}
-      {{ checkbox_group("Compliance frameworks", "compliance", compliance_options, selected_compliance) }}
-      {{ checkbox_group("Existing tooling", "tooling", tooling_options, selected_tooling) }}
-    {% endcall %}
-
-    {{ info_card("Your answers shape which security and debt questions appear in the interview.", "tip") }}
-
-    <div class="form-actions form-actions-card">
-      <button type="submit" class="btn primary btn-lg">Continue to objectives →</button>
-    </div>
-  </form>
-</article>
+  {{ submit_row('Continue to objectives', true) }}
+  {{ form_footer(1) }}
+</form>
 {% endblock %}

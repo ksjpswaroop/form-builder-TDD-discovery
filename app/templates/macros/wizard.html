@@ -1,10 +1,10 @@
-{% macro wizard_progress(step, base_path) %}
+{% macro wizard_stepper(step, base_path) %}
 {% set steps = [
-  ('intake', 'Business', 'Organization profile', 1, 'indigo'),
-  ('objectives', 'Objectives', 'Assessment goals', 2, 'pink'),
-  ('applications', 'Apps', 'System inventory', 3, 'teal'),
-  ('interview', 'Interview', 'Adaptive questions', 4, 'amber'),
-  ('plan', 'Plan', 'Review & export', 5, 'violet'),
+  ('intake', 'Business', 'Org profile, tooling, risk', 1),
+  ('objectives', 'Objectives', 'What success looks like', 2),
+  ('applications', 'Apps', 'Inventory your systems', 3),
+  ('interview', 'Interview', 'Adaptive deep-dive', 4),
+  ('plan', 'Plan', 'Reviewed assessment', 5),
 ] %}
 {% set step_paths = {
   'intake': 'intake',
@@ -14,28 +14,35 @@
   'plan': 'plan',
 } %}
 {% set current = steps | selectattr('0', 'equalto', step) | map(attribute='3') | first | default(1) %}
-{% set progress_pct = ((current - 1) / (steps | length - 1) * 100) if steps | length > 1 else 0 %}
-{% set current_label = steps | selectattr('0', 'equalto', step) | map(attribute='2') | first %}
 
-<nav class="wizard-panel" aria-label="Discovery wizard progress">
-  <div class="wizard-panel-top">
-    <div class="wizard-panel-meta">
-      <span class="wizard-pill">Step {{ current }} of {{ steps | length }}</span>
-      <h2 class="wizard-current-title">{{ current_label }}</h2>
-    </div>
-    <div class="wizard-progress-track">
-      <div class="wizard-progress-fill" style="width: {{ progress_pct }}%"></div>
-    </div>
-  </div>
-  <ol class="wizard-track">
-    {% for key, short, desc, num, accent in steps %}
-    <li class="wizard-track-step wizard-track-step--{{ accent }} {% if step == key %}is-active{% elif num < current %}is-done{% endif %}">
-      <a href="{{ base_path }}/{{ step_paths[key] }}" class="wizard-track-card" title="{{ desc }}">
-        <span class="wizard-track-num">{{ num }}</span>
-        <span class="wizard-track-label">{{ short }}</span>
+<aside class="stepper" aria-label="Wizard progress">
+  <div class="stepper-title">Discovery path</div>
+  <ol class="stepper-list">
+    {% for key, name, desc, num in steps %}
+    <li class="step" data-state="{% if step == key %}active{% elif num < current %}done{% else %}pending{% endif %}">
+      {% if num < current %}
+      <a href="{{ base_path }}/{{ step_paths[key] }}" class="step-link">
+        <span class="step-marker">✓</span>
+        <div class="step-body">
+          <span class="step-name">{{ name }}</span>
+          <span class="step-desc">{{ desc }}</span>
+        </div>
       </a>
+      {% elif step == key %}
+      <span class="step-marker">{{ num }}</span>
+      <div class="step-body">
+        <span class="step-name">{{ name }}</span>
+        <span class="step-desc">{{ desc }}</span>
+      </div>
+      {% else %}
+      <span class="step-marker">{{ num }}</span>
+      <div class="step-body">
+        <span class="step-name">{{ name }}</span>
+        <span class="step-desc">{{ desc }}</span>
+      </div>
+      {% endif %}
     </li>
     {% endfor %}
   </ol>
-</nav>
+</aside>
 {% endmacro %}

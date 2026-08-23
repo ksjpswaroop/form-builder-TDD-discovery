@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import csrf_field %}
-{% from "macros/cards.html" import info_card %}
+{% from "macros/layout.html" import page_hero, submit_row, form_footer %}
 {% block content %}
+{{ page_hero('plan') }}
+
 <section class="coverage-panel">
   <div class="stat-card-grid">
     <div class="stat-card stat-card--success">
@@ -23,23 +25,21 @@
   </div>
 </section>
 
-<article class="card wizard-card">
-  <div class="card-header">
-    <span class="step-badge step-badge-5">Step 5</span>
-    <h2>Assessment plan</h2>
-    {% if not plan_approved %}
-    <p class="lead">Review the assessment plan document. Approval generates PDF, Excel, and JSON exports.</p>
-    {% endif %}
-  </div>
+<div class="form">
   {% if plan_approved %}
-  <p class="success-banner">Plan approved. Documents are ready for download.</p>
+  <div class="banner banner-success">Plan approved. Documents are ready for download.</div>
   <div class="download-actions">
-    <a href="{{ base_path }}/documents/pdf" class="btn primary">Download PDF</a>
-    <a href="{{ base_path }}/documents/xlsx" class="btn secondary">Download Excel</a>
-    <a href="{{ base_path }}/documents/json" class="btn secondary">Download JSON</a>
+    <a href="{{ base_path }}/documents/pdf" class="btn-primary" style="max-width:200px;">Download PDF</a>
+    <a href="{{ base_path }}/documents/xlsx" class="btn-secondary">Download Excel</a>
+    <a href="{{ base_path }}/documents/json" class="btn-secondary">Download JSON</a>
   </div>
   {% else %}
-  {{ info_card("Approve to generate PDF, Excel, and JSON — plus your retrieval key.", "tip") }}
+  <div class="callout callout-tip">
+    <span class="callout-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </span>
+    <span>Approve to generate PDF, Excel, and JSON — plus your retrieval key.</span>
+  </div>
   {% endif %}
 
   {% include "plan_document.html" %}
@@ -50,19 +50,21 @@
   </details>
 
   {% if not plan_approved %}
-  <div class="form-actions form-actions-card">
-    <form method="post" action="{{ base_path }}/plan/approve">
-      {{ csrf_field() }}
-      <button type="submit" class="btn primary btn-lg">Approve plan and generate documents</button>
-    </form>
-    <a href="{{ base_path }}/interview" class="btn secondary">Back to interview</a>
+  <form method="post" action="{{ base_path }}/plan/approve">
+    {{ csrf_field() }}
+    {{ submit_row('Approve plan and generate documents', true) }}
+    {{ form_footer(5) }}
+  </form>
+  <div class="form-actions-inline">
+    <a href="{{ base_path }}/interview" class="btn-secondary">Back to interview</a>
   </div>
   {% else %}
-  <div class="form-actions form-actions-inline">
-    <a href="{{ base_path }}/interview" class="btn secondary">Back to interview</a>
+  <div class="form-actions-inline mt">
+    <a href="{{ base_path }}/interview" class="btn-secondary">Back to interview</a>
   </div>
+  {{ form_footer(5) }}
   {% endif %}
-</article>
+</div>
 
 {% if show_key_modal %}
 <div id="key-modal" class="modal-overlay" role="dialog" aria-modal="true">
@@ -70,7 +72,7 @@
     <h3>Save your retrieval key</h3>
     <p>Copy this key to return and edit your submission later.</p>
     <div class="key-display" id="access-key-display">{{ access_key }}</div>
-    <button type="button" class="btn primary" onclick="document.getElementById('key-modal').style.display='none'">I've saved my key</button>
+    <button type="button" class="btn-primary" style="max-width:none;" onclick="document.getElementById('key-modal').style.display='none'">I've saved my key</button>
   </div>
 </div>
 {% endif %}

@@ -1,0 +1,122 @@
+{% from "macros/wizard.html" import wizard_stepper %}
+{% from "macros/icons.html" import icon_building, icon_globe, icon_shield, icon_target, icon_apps, icon_chat, icon_doc %}
+
+{% macro page_hero(step) %}
+{% set heroes = {
+  'intake': {
+    'num': '01', 'label': 'Business Details',
+    'title': 'Tell us about your organization.',
+    'desc': 'A few details so the interview adapts to your stack, scale, and risk posture. Most teams finish this in under two minutes.',
+    'time': '~2 min', 'count': '8 questions'
+  },
+  'objectives': {
+    'num': '02', 'label': 'Objectives',
+    'title': 'Define what success looks like.',
+    'desc': 'Your goals shape question priority, report format, and how aggressively we probe gaps.',
+    'time': '~1 min', 'count': '5 questions'
+  },
+  'applications': {
+    'num': '03', 'label': 'Applications',
+    'title': 'Inventory your systems.',
+    'desc': 'Register each application to assess — one product may span multiple repositories.',
+    'time': '~3 min', 'count': 'Per app'
+  },
+  'interview': {
+    'num': '04', 'label': 'Interview',
+    'title': 'Adaptive deep-dive questions.',
+    'desc': 'Each question explains why we ask and what a good answer looks like.',
+    'time': '10–20 min', 'count': 'Adaptive'
+  },
+  'plan': {
+    'num': '05', 'label': 'Plan',
+    'title': 'Review your Assessment plan.',
+    'desc': 'Approve to generate PDF, Excel, and JSON exports plus your retrieval key.',
+    'time': 'Review', 'count': 'Final step'
+  },
+} %}
+{% set h = heroes.get(step, heroes['intake']) %}
+<section class="hero">
+  <div>
+    <div class="eyebrow">
+      <span class="dot" aria-hidden="true"></span>
+      Step {{ h.num }} &middot; {{ h.label }}
+    </div>
+    <h1>{{ h.title }}</h1>
+    <p>{{ h.desc }}</p>
+    <div class="hero-meta">
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        {{ h.time }}
+      </span>
+      <span class="hero-meta-divider"></span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        {{ h.count }}
+      </span>
+      <span class="hero-meta-divider"></span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+        Adapts to your answers
+      </span>
+    </div>
+  </div>
+  {{ wizard_stepper(step, base_path) }}
+</section>
+{% endmacro %}
+
+{% macro form_section(num, title, subtitle, icon='default') %}
+<div class="section">
+  <div class="section-head">
+    <div class="section-num">{{ num }}</div>
+    <div class="section-icon">
+      {% if icon == 'building' %}{{ icon_building() }}
+      {% elif icon == 'globe' %}{{ icon_globe() }}
+      {% elif icon == 'shield' %}{{ icon_shield() }}
+      {% elif icon == 'target' %}{{ icon_target() }}
+      {% elif icon == 'apps' %}{{ icon_apps() }}
+      {% elif icon == 'chat' %}{{ icon_chat() }}
+      {% elif icon == 'doc' %}{{ icon_doc() }}
+      {% else %}{{ icon_building() }}
+      {% endif %}
+    </div>
+    <div class="section-titles">
+      <h2 class="section-title">{{ title }}</h2>
+      <p class="section-sub">{{ subtitle }}</p>
+    </div>
+  </div>
+  <div class="section-body">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro form_footer(step_num, total=5) %}
+<div class="footer">
+  <div class="footer-left">
+    <span class="footer-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      End-to-end encrypted
+    </span>
+    <span class="footer-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Your information is secured
+    </span>
+  </div>
+  <div class="footer-progress">Step <b>{{ step_num }}</b> of <b>{{ total }}</b></div>
+</div>
+{% endmacro %}
+
+{% macro submit_row(button_text, show_save=false) %}
+<div class="submit-row">
+  {% if show_save %}
+  <a class="save-link" href="{{ root_path }}/retrieve">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Save &amp; finish later
+  </a>
+  {% endif %}
+  <button type="submit" class="btn-primary">
+    {{ button_text }}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </button>
+</div>
+{% endmacro %}

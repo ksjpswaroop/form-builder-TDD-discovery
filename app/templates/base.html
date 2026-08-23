@@ -6,39 +6,38 @@
   <title>Discovery — {{ step if step is defined else 'Home' }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ root_path }}/static/css/style.css">
   <script src="{{ root_path }}/static/js/htmx.min.js" defer></script>
+  <script src="{{ root_path }}/static/js/ui.js" defer></script>
 </head>
 <body class="{% if step is defined %}step-{{ step }}{% endif %}">
-  <div class="ambient-bg" aria-hidden="true">
-    <span class="ambient-orb ambient-orb--1"></span>
-    <span class="ambient-orb ambient-orb--2"></span>
-    <span class="ambient-orb ambient-orb--3"></span>
-  </div>
-  <header class="site-header">
-    <div class="header-shell">
-      <div class="header-inner">
-        <div class="header-brand">
-          <div class="brand-mark" aria-hidden="true"></div>
-          <div>
-            <h1>Technical Debt Discovery</h1>
-            <p class="header-sub">Guided assessment wizard</p>
-          </div>
-        </div>
-        <div class="header-actions">
-          <p class="security-badge" aria-label="Secured">Your information is secured</p>
-          <a href="{{ root_path }}/retrieve" class="btn btn-ghost btn-sm">Retrieve submission</a>
-        </div>
-      </div>
-      {% if access_key is defined and access_key and step is defined %}
-      {% from "macros/wizard.html" import wizard_progress %}
-      {{ wizard_progress(step, base_path) }}
-      {% endif %}
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{{ root_path }}/" style="text-decoration:none;color:inherit;">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text">
+        Technical Debt Discovery
+        <small>guided assessment</small>
+      </span>
+    </a>
+    <div class="topbar-actions">
+      <span class="topbar-secure">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Encrypted in transit
+      </span>
+      <a class="topbar-link" href="{{ root_path }}/retrieve">
+        Retrieve submission
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
     </div>
-  </header>
-  <main class="container">
-    {% block content %}{% endblock %}
-  </main>
+  </div>
+</header>
+
+<main class="page">
+  {% block content %}{% endblock %}
+</main>
+
 </body>
 </html>

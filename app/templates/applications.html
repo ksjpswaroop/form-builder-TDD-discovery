@@ -1,14 +1,10 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import select_field, checkbox_group, csrf_field, text_field %}
-{% from "macros/cards.html" import section_card, info_card %}
+{% from "macros/layout.html" import page_hero, form_section, form_footer, submit_row %}
 {% block content %}
-<article class="card wizard-card">
-  <div class="card-header">
-    <span class="step-badge step-badge-3">Step 3</span>
-    <h2>Application inventory</h2>
-    <p class="lead">Register each application to assess. One application may span multiple repositories.</p>
-  </div>
+{{ page_hero('applications') }}
 
+<div class="form">
   {% if applications %}
   <div class="app-card-grid">
     {% for app in applications %}
@@ -38,41 +34,47 @@
     {% endfor %}
   </div>
   {% else %}
-  {{ info_card("Add at least one application before starting the interview.", "tip") }}
+  <div class="callout callout-tip">
+    <span class="callout-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </span>
+    <span>Add at least one application before starting the interview.</span>
+  </div>
   {% endif %}
 
-  {% call section_card("Add application", "Details for a system in your portfolio", "teal") %}
-    <form method="post" action="{{ base_path }}/applications" class="wizard-form">
+  {% call form_section('01', 'Add application', 'Details for a system in your portfolio.', 'apps') %}
+    <form method="post" action="{{ base_path }}/applications">
       {{ csrf_field() }}
-      <div class="field-grid field-grid--2">
-        {{ text_field("Name", "name", "", true) }}
-        {{ text_field("Description", "description") }}
-        {{ text_field("Business owner", "business_owner") }}
-        {{ text_field("Technical owner", "technical_owner") }}
+      <div class="field-grid">
+        {{ text_field('Name', 'name', '', true) }}
+        {{ text_field('Description', 'description') }}
+        {{ text_field('Business owner', 'business_owner') }}
+        {{ text_field('Technical owner', 'technical_owner') }}
       </div>
-      {{ text_field("Repositories", "repositories", "", false, "text", "github.com/org/repo") }}
-      <div class="field-grid field-grid--2">
-        {{ select_field("Production status", "production_status", production_status_options) }}
-        {{ select_field("Exposure", "exposure", exposure_options) }}
+      {{ text_field('Repositories', 'repositories', '', false, 'text', 'github.com/org/repo') }}
+      <div class="field-grid">
+        {{ select_field('Production status', 'production_status', production_status_options) }}
+        {{ select_field('Exposure', 'exposure', exposure_options) }}
       </div>
-      {{ checkbox_group("Data classes", "data_classes", data_class_options) }}
-      <div class="field-grid field-grid--2">
-        {{ select_field("Criticality", "criticality", criticality_options) }}
-        {{ select_field("User count", "user_count", user_count_options) }}
+      {{ checkbox_group('Data classes', 'data_classes', data_class_options) }}
+      <div class="field-grid">
+        {{ select_field('Criticality', 'criticality', criticality_options) }}
+        {{ select_field('User count', 'user_count', user_count_options) }}
       </div>
-      <div class="form-actions form-actions-inline">
-        <button type="submit" class="btn secondary">+ Add to inventory</button>
+      <div class="form-actions-inline">
+        <button type="submit" class="btn-secondary">+ Add to inventory</button>
       </div>
     </form>
   {% endcall %}
 
   {% if applications %}
-  <div class="form-actions form-actions-card">
-    <form method="post" action="{{ base_path }}/applications/done">
-      {{ csrf_field() }}
-      <button type="submit" class="btn primary btn-lg">Start adaptive interview →</button>
-    </form>
-  </div>
+  <form method="post" action="{{ base_path }}/applications/done">
+    {{ csrf_field() }}
+    {{ submit_row('Start adaptive interview', true) }}
+    {{ form_footer(3) }}
+  </form>
+  {% else %}
+  {{ form_footer(3) }}
   {% endif %}
-</article>
+</div>
 {% endblock %}

@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import csrf_field %}
+{% from "macros/layout.html" import page_hero, submit_row, form_footer %}
 {% block content %}
+{{ page_hero('interview') }}
+
 <section class="coverage-panel">
   <div class="stat-card-grid">
     <div class="stat-card stat-card--success">
@@ -29,117 +32,127 @@
   </div>
 </section>
 
-<article class="card wizard-card">
-  <div class="card-header">
-    <span class="step-badge step-badge-4">Step 4</span>
-    <h2>Interview round {{ round_number }}</h2>
-    <p class="lead">Each question explains why we need the answer and shows examples of good responses.</p>
+<form class="form" method="post" action="{{ base_path }}/interview">
+  {{ csrf_field() }}
+
+  <div class="section" style="margin-bottom: 24px;">
+    <div class="section-head" style="margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
+      <div class="section-num">04</div>
+      <div class="section-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="section-titles">
+        <h2 class="section-title">Interview round {{ round_number }}</h2>
+        <p class="section-sub">Each question explains why we ask and what a good answer looks like.</p>
+      </div>
+    </div>
   </div>
 
-  <form method="post" action="{{ base_path }}/interview">
-    {{ csrf_field() }}
-    {% for q in questions %}
-    {% set field_key = q.question_id ~ '::' ~ (q.applies_to or '') %}
-    <article class="question-card" id="q-{{ field_key | replace('::', '-') }}">
-      <div class="question-header">
-        <img src="{{ root_path }}/static/graphics/{{ graphics.get(q.section, 'company.svg') }}" alt="" class="section-graphic" width="48" height="48">
-        <div>
-          <span class="section-badge">{{ section_titles.get(q.section, q.section) }}</span>
-          {% if q.applies_to %}<span class="app-badge">{{ q.applies_to }}</span>{% endif %}
-        </div>
+  {% for q in questions %}
+  {% set field_key = q.question_id ~ '::' ~ (q.applies_to or '') %}
+  <article class="question-card" id="q-{{ field_key | replace('::', '-') }}">
+    <div class="question-header">
+      <img src="{{ root_path }}/static/graphics/{{ graphics.get(q.section, 'company.svg') }}" alt="" class="section-graphic" width="48" height="48">
+      <div>
+        <span class="section-badge">{{ section_titles.get(q.section, q.section) }}</span>
+        {% if q.applies_to %}<span class="app-badge">{{ q.applies_to }}</span>{% endif %}
       </div>
+    </div>
 
-      <h3 class="question-text">{{ q.question }}</h3>
+    <h3 class="question-text">{{ q.question }}</h3>
 
-      <div class="reason-box">
-        <strong>Why we ask</strong>
-        <p>{{ q.reason }}</p>
-      </div>
+    <div class="reason-box">
+      <strong>Why we ask</strong>
+      <p>{{ q.reason }}</p>
+    </div>
 
-      {% if q.examples %}
-      <div class="examples-box">
-        <strong>What a good answer looks like</strong>
-        <ul>
-          {% for ex in q.examples %}
-          <li>{{ ex }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
+    {% if q.examples %}
+    <div class="examples-box">
+      <strong>What a good answer looks like</strong>
+      <ul>
+        {% for ex in q.examples %}
+        <li>{{ ex }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
 
-      {% if q.evidence_requested %}
-      <div class="evidence-box">
-        <strong>Evidence we may request</strong>
-        <ul>
-          {% for ev in q.evidence_requested %}
-          <li>{{ ev }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
+    {% if q.evidence_requested %}
+    <div class="evidence-box">
+      <strong>Evidence we may request</strong>
+      <ul>
+        {% for ev in q.evidence_requested %}
+        <li>{{ ev }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
 
-      <div class="answer-area">
-        {% if q.answer_type == 'single_select' or q.answer_type == 'yes_no' %}
-        <select name="q__{{ field_key }}">
-          <option value="">Select…</option>
-          {% for opt in q.options %}
-          <option value="{{ opt }}">{{ opt }}</option>
-          {% endfor %}
-          {% if q.answer_type == 'yes_no' %}
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
-          {% endif %}
-        </select>
-        {% elif q.answer_type == 'multi_select' %}
-        <fieldset class="option-fieldset">
-          <legend class="field-label">Select all that apply</legend>
-          <div class="option-stack">
-            {% for opt in q.options %}
-            <label class="option-item">
-              <input type="checkbox" name="q__{{ field_key }}" value="{{ opt }}">
-              <span class="option-item-text">{{ opt }}</span>
-            </label>
-            {% endfor %}
-          </div>
-        </fieldset>
-        {% elif q.answer_type == 'number' %}
-        <input type="number" name="q__{{ field_key }}">
-        {% else %}
-        <textarea name="q__{{ field_key }}" rows="3" placeholder="Your answer…"></textarea>
+    <div class="answer-area">
+      {% if q.answer_type == 'single_select' or q.answer_type == 'yes_no' %}
+      <select class="control" name="q__{{ field_key }}">
+        <option value="">Select…</option>
+        {% for opt in q.options %}
+        <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+        {% if q.answer_type == 'yes_no' %}
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
         {% endif %}
-      </div>
-
-      <div class="status-row option-fieldset">
-        <span class="field-label">Response status</span>
-        <div class="option-stack option-stack-radio">
-          <label class="option-item option-item-radio">
-            <input type="radio" name="status__{{ field_key }}" value="answered" checked>
-            <span class="option-item-text">Answer provided</span>
+      </select>
+      {% elif q.answer_type == 'multi_select' %}
+      <fieldset class="option-fieldset">
+        <legend class="field-label">Select all that apply</legend>
+        <div class="option-stack">
+          {% for opt in q.options %}
+          <label class="option-item">
+            <input type="checkbox" name="q__{{ field_key }}" value="{{ opt }}">
+            <span class="option-item-text">{{ opt }}</span>
           </label>
-          <label class="option-item option-item-radio">
-            <input type="radio" name="status__{{ field_key }}" value="unknown">
-            <span class="option-item-text">Unknown</span>
-          </label>
-          <label class="option-item option-item-radio">
-            <input type="radio" name="status__{{ field_key }}" value="not_applicable">
-            <span class="option-item-text">Not applicable</span>
-          </label>
+          {% endfor %}
         </div>
+      </fieldset>
+      {% elif q.answer_type == 'number' %}
+      <input class="control" type="number" name="q__{{ field_key }}">
+      {% else %}
+      <textarea class="control" name="q__{{ field_key }}" rows="3" placeholder="Your answer…"></textarea>
+      {% endif %}
+    </div>
+
+    <div class="status-row">
+      <span class="field-label">Response status</span>
+      <div class="option-stack">
+        <label class="option-item">
+          <input type="radio" name="status__{{ field_key }}" value="answered" checked>
+          <span class="option-item-text">Answer provided</span>
+        </label>
+        <label class="option-item">
+          <input type="radio" name="status__{{ field_key }}" value="unknown">
+          <span class="option-item-text">Unknown</span>
+        </label>
+        <label class="option-item">
+          <input type="radio" name="status__{{ field_key }}" value="not_applicable">
+          <span class="option-item-text">Not applicable</span>
+        </label>
       </div>
+    </div>
 
-      <label class="notes-label">Additional notes (free form)
-        <textarea name="notes__{{ field_key }}" rows="2" placeholder="Extra context, links to evidence, caveats…"></textarea>
-      </label>
-    </article>
-    {% endfor %}
+    <label class="notes-label">Additional notes
+      <textarea name="notes__{{ field_key }}" rows="2" placeholder="Extra context, links to evidence, caveats…"></textarea>
+    </label>
+  </article>
+  {% endfor %}
 
-    <div class="form-actions form-actions-card">
-      <button type="submit" class="btn primary btn-lg">Submit round &amp; continue</button>
+  {{ submit_row('Submit round & continue', true) }}
+  {{ form_footer(4) }}
+</form>
+
+<div class="form">
+  <form method="post" action="{{ base_path }}/interview/generate-plan">
+    {{ csrf_field() }}
+    <div class="form-actions-inline">
+      <button type="submit" class="btn-secondary">Generate plan now (even with gaps)</button>
     </div>
   </form>
-  <form method="post" action="{{ base_path }}/interview/generate-plan" class="form-actions form-actions-inline mt">
-    {{ csrf_field() }}
-    <button type="submit" class="btn secondary">Generate plan now (even with gaps)</button>
-  </form>
-</article>
+</div>
 {% endblock %}

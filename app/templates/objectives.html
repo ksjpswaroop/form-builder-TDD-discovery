@@ -1,33 +1,33 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import select_field, checkbox_group, csrf_field %}
-{% from "macros/cards.html" import section_card, info_card %}
+{% from "macros/layout.html" import page_hero, form_section, form_footer, submit_row %}
 {% block content %}
-<article class="card wizard-card">
-  <div class="card-header">
-    <span class="step-badge step-badge-2">Step 2</span>
-    <h2>Assessment objectives</h2>
-    <p class="lead">What should this discovery produce? This drives question priority and report format.</p>
+{{ page_hero('objectives') }}
+
+<form class="form" method="post" action="{{ base_path }}/objectives" novalidate>
+  {{ csrf_field() }}
+
+  {% call form_section('01', 'Primary goals', 'What outcome matters most for this discovery?', 'target') %}
+    {{ select_field('Primary goal', 'primary_goal', goal_options, objectives.primary_goal, true) }}
+    {{ checkbox_group('Report audiences', 'report_audiences', audience_options, objectives.report_audiences) }}
+  {% endcall %}
+
+  {% call form_section('02', 'Release & remediation', 'How findings should affect delivery and remediation.', 'shield') %}
+    {{ checkbox_group('Release blockers', 'release_blockers', blocker_options, objectives.release_blockers) }}
+    <div class="field-grid">
+      {{ select_field('Assessment frequency', 'assessment_frequency', frequency_options, objectives.assessment_frequency) }}
+      {{ select_field('Remediation capacity', 'remediation_capacity', capacity_options, objectives.remediation_capacity) }}
+    </div>
+  {% endcall %}
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </span>
+    <span>Objectives directly influence which sections get prioritized in your assessment plan.</span>
   </div>
 
-  <form method="post" action="{{ base_path }}/objectives" class="wizard-form">
-    {{ csrf_field() }}
-
-    {% call section_card("Primary goals", "What outcome matters most?", "pink") %}
-      {{ select_field("Primary goal", "primary_goal", goal_options, objectives.primary_goal, true) }}
-      {{ checkbox_group("Report audiences", "report_audiences", audience_options, objectives.report_audiences) }}
-    {% endcall %}
-
-    {% call section_card("Release & remediation", "How findings should affect delivery", "amber") %}
-      {{ checkbox_group("Release blockers", "release_blockers", blocker_options, objectives.release_blockers) }}
-      {{ select_field("Assessment frequency", "assessment_frequency", frequency_options, objectives.assessment_frequency) }}
-      {{ select_field("Remediation capacity", "remediation_capacity", capacity_options, objectives.remediation_capacity) }}
-    {% endcall %}
-
-    {{ info_card("Objectives directly influence which sections get prioritized in your assessment plan.", "tip") }}
-
-    <div class="form-actions form-actions-card">
-      <button type="submit" class="btn primary btn-lg">Continue to applications →</button>
-    </div>
-  </form>
-</article>
+  {{ submit_row('Continue to applications', true) }}
+  {{ form_footer(2) }}
+</form>
 {% endblock %}
