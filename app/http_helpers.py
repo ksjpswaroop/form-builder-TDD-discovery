@@ -17,7 +17,7 @@ def render_page(
     status_code: int = 200,
 ) -> Response:
     token = get_csrf_token(request)
-    root_path = request.scope.get("root_path", settings.root_path or "")
+    root_path = request.scope.get("root_path") or settings.root_path or ""
     context = {**context, "csrf_token": token, "root_path": root_path}
     response = templates.TemplateResponse(
         request, template_name, context, status_code=status_code
