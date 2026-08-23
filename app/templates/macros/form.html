@@ -3,25 +3,43 @@
 {% endmacro %}
 
 {% macro select_field(label, name, options, selected='', required=false) %}
-<label>{{ label }}
-  <select name="{{ name }}"{% if required %} required{% endif %}>
-    <option value="">Select…</option>
+<div class="field-group">
+  <label class="field-label" for="field-{{ name }}">{{ label }}</label>
+  <select id="field-{{ name }}" name="{{ name }}" class="field-control"{% if required %} required{% endif %}>
+    <option value="">Select an option…</option>
     {% for opt in options %}
     <option value="{{ opt }}"{% if selected == opt %} selected{% endif %}>{{ opt }}</option>
     {% endfor %}
   </select>
-</label>
+</div>
 {% endmacro %}
 
 {% macro checkbox_group(legend, name, options, selected=[]) %}
-<fieldset>
-  <legend>{{ legend }}</legend>
-  {% for opt in options %}
-  <label class="checkbox">
-    <input type="checkbox" name="{{ name }}" value="{{ opt }}"
-      {% if opt in selected %}checked{% endif %}>
-    {{ opt }}
-  </label>
-  {% endfor %}
+<fieldset class="option-fieldset">
+  <legend class="field-label">{{ legend }}</legend>
+  <div class="option-stack">
+    {% for opt in options %}
+    <label class="option-item">
+      <input type="checkbox" name="{{ name }}" value="{{ opt }}"
+        {% if opt in selected %}checked{% endif %}>
+      <span class="option-item-text">{{ opt }}</span>
+    </label>
+    {% endfor %}
+  </div>
 </fieldset>
+{% endmacro %}
+
+{% macro text_field(label, name, value='', required=false, type='text', placeholder='') %}
+<div class="field-group">
+  <label class="field-label" for="field-{{ name }}">{{ label }}</label>
+  <input id="field-{{ name }}" type="{{ type }}" name="{{ name }}" class="field-control"
+    value="{{ value }}"{% if required %} required{% endif %}{% if placeholder %} placeholder="{{ placeholder }}"{% endif %}>
+</div>
+{% endmacro %}
+
+{% macro textarea_field(label, name, value='', rows=3) %}
+<div class="field-group">
+  <label class="field-label" for="field-{{ name }}">{{ label }}</label>
+  <textarea id="field-{{ name }}" name="{{ name }}" class="field-control" rows="{{ rows }}">{{ value }}</textarea>
+</div>
 {% endmacro %}

@@ -1,0 +1,38 @@
+{% macro wizard_progress(step, base_path) %}
+{% set steps = [
+  ('intake', 'Business Details', 1),
+  ('objectives', 'Objectives', 2),
+  ('applications', 'Applications', 3),
+  ('interview', 'Interview', 4),
+  ('plan', 'Plan', 5),
+] %}
+{% set step_paths = {
+  'intake': 'intake',
+  'objectives': 'objectives',
+  'applications': 'applications',
+  'interview': 'interview',
+  'plan': 'plan',
+} %}
+{% set current = steps | selectattr('0', 'equalto', step) | map(attribute='2') | first | default(1) %}
+{% set progress_pct = ((current - 1) / (steps | length - 1) * 100) if steps | length > 1 else 0 %}
+
+<nav class="wizard" aria-label="Discovery wizard progress">
+  <div class="wizard-header">
+    <span class="wizard-label">Step {{ current }} of {{ steps | length }}</span>
+    <span class="wizard-step-name">{{ steps | selectattr('0', 'equalto', step) | map(attribute='1') | first }}</span>
+  </div>
+  <ol class="wizard-steps">
+    {% for key, label, num in steps %}
+    <li class="wizard-step {% if step == key %}active{% elif num < current %}completed{% endif %}">
+      <a href="{{ base_path }}/{{ step_paths[key] }}" class="wizard-step-link" title="{{ label }}">
+        <span class="wizard-step-num">{{ num }}</span>
+        <span class="wizard-step-text">{{ label }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ol>
+  <div class="wizard-progress-track">
+    <div class="wizard-progress-fill" style="width: {{ progress_pct }}%"></div>
+  </div>
+</nav>
+{% endmacro %}

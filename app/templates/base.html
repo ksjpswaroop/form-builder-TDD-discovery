@@ -7,20 +7,22 @@
   <link rel="stylesheet" href="{{ root_path }}/static/css/style.css">
   <script src="{{ root_path }}/static/js/htmx.min.js" defer></script>
 </head>
-<body>
+<body class="{% if step is defined %}step-{{ step }}{% endif %}">
   <header class="site-header">
-    <h1>Technical Debt Discovery</h1>
-    <nav class="step-nav">
-      {% if access_key is defined and access_key %}
-      <a href="{{ base_path }}/intake" class="{{ 'active' if step == 'intake' }}">Business Details</a>
-      <a href="{{ base_path }}/objectives" class="{{ 'active' if step == 'objectives' }}">Objectives</a>
-      <a href="{{ base_path }}/applications" class="{{ 'active' if step == 'applications' }}">Applications</a>
-      <a href="{{ base_path }}/interview" class="{{ 'active' if step == 'interview' }}">Interview</a>
-      <a href="{{ base_path }}/plan" class="{{ 'active' if step == 'plan' }}">Plan</a>
-      {% endif %}
+    <div class="header-inner">
+      <div class="header-brand">
+        <h1>Technical Debt Discovery</h1>
+        <p class="header-sub">Adaptive assessment wizard</p>
+      </div>
+      <p class="security-badge" aria-label="Secured">Your information is secured</p>
+    </div>
+    {% if access_key is defined and access_key and step is defined %}
+    {% from "macros/wizard.html" import wizard_progress %}
+    {{ wizard_progress(step, base_path) }}
+    {% endif %}
+    <nav class="step-nav-secondary">
       <a href="{{ root_path }}/retrieve" class="nav-extra">Retrieve submission</a>
     </nav>
-    <p class="security-badge" aria-label="Secured">Your information is secured</p>
   </header>
   <main class="container">
     {% block content %}{% endblock %}

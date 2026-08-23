@@ -11,8 +11,14 @@
   </div>
 </section>
 
-<section class="card">
-  <h2>Assessment plan</h2>
+<section class="card wizard-card">
+  <div class="card-header">
+    <span class="step-badge step-badge-5">Step 5</span>
+    <h2>Assessment plan</h2>
+    {% if not plan_approved %}
+    <p class="lead">Review the assessment plan document. Approval generates PDF, Excel, and JSON exports.</p>
+    {% endif %}
+  </div>
   {% if plan_approved %}
   <p class="success-banner">Plan approved. Documents are ready for download.</p>
   <div class="download-actions">
@@ -20,8 +26,6 @@
     <a href="{{ base_path }}/documents/xlsx" class="btn">Download Excel</a>
     <a href="{{ base_path }}/documents/json" class="btn">Download JSON</a>
   </div>
-  {% else %}
-  <p class="lead">Review the assessment plan document. Approval generates PDF, Excel, and JSON exports.</p>
   {% endif %}
 
   {% include "plan_document.html" %}

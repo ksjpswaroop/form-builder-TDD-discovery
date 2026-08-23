@@ -14,9 +14,12 @@
   </div>
 </section>
 
-<section class="card">
-  <h2>Interview round {{ round_number }}</h2>
-  <p class="lead">Each question explains why we need the answer and shows examples of good responses.</p>
+<section class="card wizard-card">
+  <div class="card-header">
+    <span class="step-badge step-badge-4">Step 4</span>
+    <h2>Interview round {{ round_number }}</h2>
+    <p class="lead">Each question explains why we need the answer and shows examples of good responses.</p>
+  </div>
 
   <form method="post" action="{{ base_path }}/interview">
     {{ csrf_field() }}
@@ -73,12 +76,16 @@
           {% endif %}
         </select>
         {% elif q.answer_type == 'multi_select' %}
-        <fieldset>
-          {% for opt in q.options %}
-          <label class="checkbox">
-            <input type="checkbox" name="q__{{ field_key }}" value="{{ opt }}"> {{ opt }}
-          </label>
-          {% endfor %}
+        <fieldset class="option-fieldset">
+          <legend class="field-label">Select all that apply</legend>
+          <div class="option-stack">
+            {% for opt in q.options %}
+            <label class="option-item">
+              <input type="checkbox" name="q__{{ field_key }}" value="{{ opt }}">
+              <span class="option-item-text">{{ opt }}</span>
+            </label>
+            {% endfor %}
+          </div>
         </fieldset>
         {% elif q.answer_type == 'number' %}
         <input type="number" name="q__{{ field_key }}">
@@ -87,16 +94,22 @@
         {% endif %}
       </div>
 
-      <div class="status-row">
-        <label class="radio-inline">
-          <input type="radio" name="status__{{ field_key }}" value="answered" checked> Answer provided
-        </label>
-        <label class="radio-inline">
-          <input type="radio" name="status__{{ field_key }}" value="unknown"> Unknown
-        </label>
-        <label class="radio-inline">
-          <input type="radio" name="status__{{ field_key }}" value="not_applicable"> Not applicable
-        </label>
+      <div class="status-row option-fieldset">
+        <span class="field-label">Response status</span>
+        <div class="option-stack option-stack-radio">
+          <label class="option-item option-item-radio">
+            <input type="radio" name="status__{{ field_key }}" value="answered" checked>
+            <span class="option-item-text">Answer provided</span>
+          </label>
+          <label class="option-item option-item-radio">
+            <input type="radio" name="status__{{ field_key }}" value="unknown">
+            <span class="option-item-text">Unknown</span>
+          </label>
+          <label class="option-item option-item-radio">
+            <input type="radio" name="status__{{ field_key }}" value="not_applicable">
+            <span class="option-item-text">Not applicable</span>
+          </label>
+        </div>
       </div>
 
       <label class="notes-label">Additional notes (free form)
