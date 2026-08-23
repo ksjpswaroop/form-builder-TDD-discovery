@@ -33,7 +33,7 @@
 </section>
 
 <form class="form" method="post" action="{{ base_path }}/interview">
-  {{ csrf_field() }}
+  {{ csrf_field(csrf_token) }}
 
   <div class="section" style="margin-bottom: 24px;">
     <div class="section-head" style="margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
@@ -149,7 +149,7 @@
 
 <div class="form">
   <form method="post" action="{{ base_path }}/interview/generate-plan">
-    {{ csrf_field() }}
+    {{ csrf_field(csrf_token) }}
     <div class="form-actions-inline">
       <button type="submit" class="btn-secondary">Generate plan now (even with gaps)</button>
     </div>

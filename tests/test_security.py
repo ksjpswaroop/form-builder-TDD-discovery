@@ -37,6 +37,14 @@ def test_path_traversal_download_rejected(client, db_engine):
     assert response.status_code == 403
 
 
+def test_csrf_token_rendered_in_form(client):
+    response = client.get("/retrieve")
+    assert response.status_code == 200
+    cookie = client.cookies.get("csrf_token")
+    assert cookie
+    assert f'name="csrf_token" value="{cookie}"' in response.text
+
+
 def test_csrf_missing_token_rejected(client):
     response = client.post(
         "/retrieve",

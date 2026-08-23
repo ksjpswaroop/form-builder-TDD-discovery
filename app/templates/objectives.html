@@ -5,7 +5,7 @@
 {{ page_hero('objectives') }}
 
 <form class="form" method="post" action="{{ base_path }}/objectives" novalidate>
-  {{ csrf_field() }}
+  {{ csrf_field(csrf_token) }}
 
   {% call form_section('01', 'Primary goals', 'What outcome matters most for this discovery?', 'target') %}
     {{ select_field('Primary goal', 'primary_goal', goal_options, objectives.primary_goal, true) }}

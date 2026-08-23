@@ -5,7 +5,7 @@
 {{ page_hero('intake') }}
 
 <form class="form" method="post" action="{{ base_path }}/intake" novalidate>
-  {{ csrf_field() }}
+  {{ csrf_field(csrf_token) }}
 
   {% call form_section('01', 'Organization', 'Core company information used to calibrate the interview.', 'building') %}
     {{ text_field('Company name', 'company_name', company.company_name, true, 'text', 'e.g. Northwind Capital') }}

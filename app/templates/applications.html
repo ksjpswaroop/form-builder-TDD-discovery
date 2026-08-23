@@ -44,7 +44,7 @@
 
   {% call form_section('01', 'Add application', 'Details for a system in your portfolio.', 'apps') %}
     <form method="post" action="{{ base_path }}/applications">
-      {{ csrf_field() }}
+      {{ csrf_field(csrf_token) }}
       <div class="field-grid">
         {{ text_field('Name', 'name', '', true) }}
         {{ text_field('Description', 'description') }}
@@ -69,7 +69,7 @@
 
   {% if applications %}
   <form method="post" action="{{ base_path }}/applications/done">
-    {{ csrf_field() }}
+    {{ csrf_field(csrf_token) }}
     {{ submit_row('Start adaptive interview', true) }}
     {{ form_footer(3) }}
   </form>

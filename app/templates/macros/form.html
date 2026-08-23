@@ -1,7 +1,7 @@
 {% from "macros/icons.html" import icon_check, icon_doc_small, icon_default %}
 
-{% macro csrf_field() %}
-<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{% macro csrf_field(token) %}
+<input type="hidden" name="csrf_token" value="{{ token }}">
 {% endmacro %}
 
 {% macro select_field(label, name, options, selected='', required=false) %}

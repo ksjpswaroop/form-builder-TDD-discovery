@@ -20,7 +20,7 @@
 </section>
 
 <form class="form" method="post" action="{{ root_path }}/retrieve" novalidate>
-  {{ csrf_field() }}
+  {{ csrf_field(csrf_token) }}
 
   {% if error %}
   <div class="banner banner-error">{{ error }}</div>

@@ -51,7 +51,7 @@
 
   {% if not plan_approved %}
   <form method="post" action="{{ base_path }}/plan/approve">
-    {{ csrf_field() }}
+    {{ csrf_field(csrf_token) }}
     {{ submit_row('Approve plan and generate documents', true) }}
     {{ form_footer(5) }}
   </form>
