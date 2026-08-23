@@ -1,0 +1,20 @@
+{% macro section_card(title, subtitle='', accent='indigo') %}
+<div class="section-card section-card--{{ accent }}">
+  <div class="section-card-head">
+    <div class="section-card-accent"></div>
+    <div class="section-card-titles">
+      <h3 class="section-card-title">{{ title }}</h3>
+      {% if subtitle %}<p class="section-card-sub">{{ subtitle }}</p>{% endif %}
+    </div>
+  </div>
+  <div class="section-card-body">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro info_card(text, variant='tip') %}
+<aside class="info-card info-card--{{ variant }}">
+  <p>{{ text }}</p>
+</aside>
+{% endmacro %}

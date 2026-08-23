@@ -1,17 +1,29 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import csrf_field %}
+{% from "macros/cards.html" import info_card %}
 {% block content %}
-<section class="coverage-bar">
-  <div class="coverage-stats">
-    <span class="stat completed">Completed: {{ coverage.completed }}</span>
-    <span class="stat missing">Missing: {{ coverage.missing }}</span>
-    <span class="stat unknown">Unknown: {{ coverage.unknown }}</span>
-    <span class="stat na">N/A: {{ coverage.not_applicable }}</span>
-    <span class="stat pct">{{ coverage.percent_complete }}% resolved</span>
+<section class="coverage-panel">
+  <div class="stat-card-grid">
+    <div class="stat-card stat-card--success">
+      <span class="stat-card-value">{{ coverage.completed }}</span>
+      <span class="stat-card-label">Completed</span>
+    </div>
+    <div class="stat-card stat-card--danger">
+      <span class="stat-card-value">{{ coverage.missing }}</span>
+      <span class="stat-card-label">Missing</span>
+    </div>
+    <div class="stat-card stat-card--warning">
+      <span class="stat-card-value">{{ coverage.unknown }}</span>
+      <span class="stat-card-label">Unknown</span>
+    </div>
+    <div class="stat-card stat-card--primary">
+      <span class="stat-card-value">{{ coverage.percent_complete }}%</span>
+      <span class="stat-card-label">Resolved</span>
+    </div>
   </div>
 </section>
 
-<section class="card wizard-card">
+<article class="card wizard-card">
   <div class="card-header">
     <span class="step-badge step-badge-5">Step 5</span>
     <h2>Assessment plan</h2>
@@ -23,9 +35,11 @@
   <p class="success-banner">Plan approved. Documents are ready for download.</p>
   <div class="download-actions">
     <a href="{{ base_path }}/documents/pdf" class="btn primary">Download PDF</a>
-    <a href="{{ base_path }}/documents/xlsx" class="btn">Download Excel</a>
-    <a href="{{ base_path }}/documents/json" class="btn">Download JSON</a>
+    <a href="{{ base_path }}/documents/xlsx" class="btn secondary">Download Excel</a>
+    <a href="{{ base_path }}/documents/json" class="btn secondary">Download JSON</a>
   </div>
+  {% else %}
+  {{ info_card("Approve to generate PDF, Excel, and JSON — plus your retrieval key.", "tip") }}
   {% endif %}
 
   {% include "plan_document.html" %}
@@ -36,25 +50,28 @@
   </details>
 
   {% if not plan_approved %}
-  <form method="post" action="{{ base_path }}/plan/approve" class="mt">
-    {{ csrf_field() }}
-    <button type="submit" class="btn primary">Approve plan and generate documents</button>
-  </form>
+  <div class="form-actions form-actions-card">
+    <form method="post" action="{{ base_path }}/plan/approve">
+      {{ csrf_field() }}
+      <button type="submit" class="btn primary btn-lg">Approve plan and generate documents</button>
+    </form>
+    <a href="{{ base_path }}/interview" class="btn secondary">Back to interview</a>
+  </div>
+  {% else %}
+  <div class="form-actions form-actions-inline">
+    <a href="{{ base_path }}/interview" class="btn secondary">Back to interview</a>
+  </div>
   {% endif %}
-
-  <a href="{{ base_path }}/interview" class="btn secondary">Back to interview</a>
-</section>
+</article>
 
 {% if show_key_modal %}
 <div id="key-modal" class="modal-overlay" role="dialog" aria-modal="true">
   <div class="modal-card">
     <h3>Save your retrieval key</h3>
-    <p>Store this key securely. You will need it to retrieve and update your submission in the future. It is also printed on your PDF.</p>
-    <div class="key-display" id="access-key-value">{{ access_key }}</div>
-    <button type="button" class="btn" id="copy-key-btn">Copy key</button>
-    <button type="button" class="btn primary" id="close-key-modal">I have saved my key</button>
+    <p>Copy this key to return and edit your submission later.</p>
+    <div class="key-display" id="access-key-display">{{ access_key }}</div>
+    <button type="button" class="btn primary" onclick="document.getElementById('key-modal').style.display='none'">I've saved my key</button>
   </div>
 </div>
-<script src="{{ root_path }}/static/js/plan.js"></script>
 {% endif %}
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import select_field, checkbox_group, csrf_field, text_field %}
+{% from "macros/cards.html" import section_card, info_card %}
 {% block content %}
-<section class="card wizard-card">
+<article class="card wizard-card">
   <div class="card-header">
     <span class="step-badge step-badge-3">Step 3</span>
     <h2>Application inventory</h2>
@@ -9,58 +10,69 @@
   </div>
 
   {% if applications %}
-  <div class="app-list">
-    <h3 class="section-subtitle">Registered applications</h3>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Criticality</th>
-          <th>Exposure</th>
-          <th>Data</th>
-          <th>Repos</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app in applications %}
-        <tr>
-          <td>{{ app.name }}</td>
-          <td>{{ app.criticality }}</td>
-          <td>{{ app.exposure }}</td>
-          <td>{{ app.data_classes }}</td>
-          <td>{{ app.repositories }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="app-card-grid">
+    {% for app in applications %}
+    <div class="app-card">
+      <div class="app-card-head">
+        <h3 class="app-card-name">{{ app.name }}</h3>
+        {% if app.criticality %}
+        <span class="app-card-chip app-card-chip--critical">{{ app.criticality }}</span>
+        {% endif %}
+      </div>
+      {% if app.description %}<p class="app-card-desc">{{ app.description }}</p>{% endif %}
+      <dl class="app-card-meta">
+        {% if app.exposure %}
+        <div><dt>Exposure</dt><dd>{{ app.exposure }}</dd></div>
+        {% endif %}
+        {% if app.data_classes %}
+        <div><dt>Data</dt><dd>{{ app.data_classes }}</dd></div>
+        {% endif %}
+        {% if app.repositories %}
+        <div><dt>Repos</dt><dd>{{ app.repositories }}</dd></div>
+        {% endif %}
+        {% if app.business_owner %}
+        <div><dt>Business owner</dt><dd>{{ app.business_owner }}</dd></div>
+        {% endif %}
+      </dl>
+    </div>
+    {% endfor %}
   </div>
+  {% else %}
+  {{ info_card("Add at least one application before starting the interview.", "tip") }}
   {% endif %}
 
-  <div class="wizard-form-section">
-    <h3 class="section-subtitle">Add application</h3>
+  {% call section_card("Add application", "Details for a system in your portfolio", "teal") %}
     <form method="post" action="{{ base_path }}/applications" class="wizard-form">
       {{ csrf_field() }}
-      {{ text_field("Name", "name", "", true) }}
-      {{ text_field("Description", "description") }}
-      {{ text_field("Business owner", "business_owner") }}
-      {{ text_field("Technical owner", "technical_owner") }}
+      <div class="field-grid field-grid--2">
+        {{ text_field("Name", "name", "", true) }}
+        {{ text_field("Description", "description") }}
+        {{ text_field("Business owner", "business_owner") }}
+        {{ text_field("Technical owner", "technical_owner") }}
+      </div>
       {{ text_field("Repositories", "repositories", "", false, "text", "github.com/org/repo") }}
-      {{ select_field("Production status", "production_status", production_status_options) }}
-      {{ select_field("Exposure", "exposure", exposure_options) }}
+      <div class="field-grid field-grid--2">
+        {{ select_field("Production status", "production_status", production_status_options) }}
+        {{ select_field("Exposure", "exposure", exposure_options) }}
+      </div>
       {{ checkbox_group("Data classes", "data_classes", data_class_options) }}
-      {{ select_field("Criticality", "criticality", criticality_options) }}
-      {{ select_field("User count", "user_count", user_count_options) }}
-      <div class="form-actions">
-        <button type="submit" class="btn secondary">+ Add application</button>
+      <div class="field-grid field-grid--2">
+        {{ select_field("Criticality", "criticality", criticality_options) }}
+        {{ select_field("User count", "user_count", user_count_options) }}
+      </div>
+      <div class="form-actions form-actions-inline">
+        <button type="submit" class="btn secondary">+ Add to inventory</button>
       </div>
     </form>
-  </div>
+  {% endcall %}
 
   {% if applications %}
-  <form method="post" action="{{ base_path }}/applications/done" class="form-actions mt">
-    {{ csrf_field() }}
-    <button type="submit" class="btn primary">Start adaptive interview →</button>
-  </form>
+  <div class="form-actions form-actions-card">
+    <form method="post" action="{{ base_path }}/applications/done">
+      {{ csrf_field() }}
+      <button type="submit" class="btn primary btn-lg">Start adaptive interview →</button>
+    </form>
+  </div>
   {% endif %}
-</section>
+</article>
 {% endblock %}

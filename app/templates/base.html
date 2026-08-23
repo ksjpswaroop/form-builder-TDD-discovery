@@ -4,25 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Discovery — {{ step if step is defined else 'Home' }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ root_path }}/static/css/style.css">
   <script src="{{ root_path }}/static/js/htmx.min.js" defer></script>
 </head>
 <body class="{% if step is defined %}step-{{ step }}{% endif %}">
+  <div class="ambient-bg" aria-hidden="true">
+    <span class="ambient-orb ambient-orb--1"></span>
+    <span class="ambient-orb ambient-orb--2"></span>
+    <span class="ambient-orb ambient-orb--3"></span>
+  </div>
   <header class="site-header">
-    <div class="header-inner">
-      <div class="header-brand">
-        <h1>Technical Debt Discovery</h1>
-        <p class="header-sub">Adaptive assessment wizard</p>
+    <div class="header-shell">
+      <div class="header-inner">
+        <div class="header-brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div>
+            <h1>Technical Debt Discovery</h1>
+            <p class="header-sub">Guided assessment wizard</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <p class="security-badge" aria-label="Secured">Your information is secured</p>
+          <a href="{{ root_path }}/retrieve" class="btn btn-ghost btn-sm">Retrieve submission</a>
+        </div>
       </div>
-      <p class="security-badge" aria-label="Secured">Your information is secured</p>
+      {% if access_key is defined and access_key and step is defined %}
+      {% from "macros/wizard.html" import wizard_progress %}
+      {{ wizard_progress(step, base_path) }}
+      {% endif %}
     </div>
-    {% if access_key is defined and access_key and step is defined %}
-    {% from "macros/wizard.html" import wizard_progress %}
-    {{ wizard_progress(step, base_path) }}
-    {% endif %}
-    <nav class="step-nav-secondary">
-      <a href="{{ root_path }}/retrieve" class="nav-extra">Retrieve submission</a>
-    </nav>
   </header>
   <main class="container">
     {% block content %}{% endblock %}

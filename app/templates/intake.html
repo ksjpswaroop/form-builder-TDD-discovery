@@ -1,25 +1,42 @@
 {% extends "base.html" %}
 {% from "macros/form.html" import select_field, checkbox_group, csrf_field, text_field, textarea_field %}
+{% from "macros/cards.html" import section_card, info_card %}
 {% block content %}
-<section class="card wizard-card">
-  <div class="card-header">
-    <span class="step-badge step-badge-1">Step 1</span>
-    <h2>Business Details</h2>
-    <p class="lead">Tell us about your organization so we can tailor the discovery interview.</p>
+<article class="card wizard-card wizard-card--hero">
+  <div class="card-hero">
+    <div class="card-hero-content">
+      <span class="step-badge step-badge-1">Step 1</span>
+      <h2>Business Details</h2>
+      <p class="lead">Tell us about your organization so we can tailor the discovery interview.</p>
+    </div>
+    <div class="card-hero-art" aria-hidden="true"></div>
   </div>
+
   <form method="post" action="{{ base_path }}/intake" class="wizard-form">
     {{ csrf_field() }}
-    {{ text_field("Company name", "company_name", company.company_name, true) }}
-    {{ select_field("Industry", "industry", industry_options, company.industry) }}
-    {{ select_field("Engineering team size", "engineering_size", engineering_size_options, company.engineering_size) }}
-    {{ textarea_field("Products and services", "products", company.products, 3) }}
-    {{ select_field("Primary countries of operation", "countries", country_options, company.countries) }}
-    {{ checkbox_group("Compliance frameworks", "compliance", compliance_options, selected_compliance) }}
-    {{ checkbox_group("Existing tooling", "tooling", tooling_options, selected_tooling) }}
-    {{ select_field("Risk tolerance", "risk_tolerance", risk_tolerance_options, company.risk_tolerance) }}
-    <div class="form-actions">
-      <button type="submit" class="btn primary">Continue to objectives →</button>
+
+    {% call section_card("Organization", "Core company information", "indigo") %}
+      {{ text_field("Company name", "company_name", company.company_name, true) }}
+      {{ select_field("Industry", "industry", industry_options, company.industry) }}
+      {{ select_field("Engineering team size", "engineering_size", engineering_size_options, company.engineering_size) }}
+      {{ textarea_field("Products and services", "products", company.products, 3) }}
+    {% endcall %}
+
+    {% call section_card("Operations & risk", "Where you operate and how you approach risk", "teal") %}
+      {{ select_field("Primary countries of operation", "countries", country_options, company.countries) }}
+      {{ select_field("Risk tolerance", "risk_tolerance", risk_tolerance_options, company.risk_tolerance) }}
+    {% endcall %}
+
+    {% call section_card("Compliance & tooling", "Select all frameworks and tools that apply", "violet") %}
+      {{ checkbox_group("Compliance frameworks", "compliance", compliance_options, selected_compliance) }}
+      {{ checkbox_group("Existing tooling", "tooling", tooling_options, selected_tooling) }}
+    {% endcall %}
+
+    {{ info_card("Your answers shape which security and debt questions appear in the interview.", "tip") }}
+
+    <div class="form-actions form-actions-card">
+      <button type="submit" class="btn primary btn-lg">Continue to objectives →</button>
     </div>
   </form>
-</section>
+</article>
 {% endblock %}
