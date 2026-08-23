@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     admin_password_hash: Optional[str] = None
     app_base_url: str = "http://127.0.0.1:8000"
     environment: str = "development"
+    root_path: str = ""
     rate_limit_login: str = "5/minute"
     rate_limit_retrieve: str = "10/minute"
 

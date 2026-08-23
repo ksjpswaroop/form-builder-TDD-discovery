@@ -10,6 +10,11 @@ COOKIE_NAME = "admin_session"
 MAX_AGE = 86400 * 7
 
 
+def _admin_cookie_path() -> str:
+    base = settings.root_path.rstrip("/")
+    return f"{base}/admin" if base else "/admin"
+
+
 def _serializer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(settings.secret_key, salt="admin-auth")
 
@@ -31,12 +36,12 @@ def set_admin_cookie(response: Response) -> None:
         samesite="strict",
         max_age=MAX_AGE,
         secure=settings.require_https,
-        path="/admin",
+        path=_admin_cookie_path(),
     )
 
 
 def clear_admin_cookie(response: Response) -> None:
-    response.delete_cookie(COOKIE_NAME, path="/admin")
+    response.delete_cookie(COOKIE_NAME, path=_admin_cookie_path())
 
 
 def is_admin_authenticated(request: Request) -> bool:

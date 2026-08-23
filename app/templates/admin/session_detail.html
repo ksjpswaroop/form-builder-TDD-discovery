@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin — Session {{ record.id }}</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="{{ root_path }}/static/css/style.css">
 </head>
 <body>
   <header class="site-header">
     <h1>Session {{ record.id }} — {{ record.company_name }}</h1>
     <nav class="step-nav">
-      <a href="/admin/sessions">All sessions</a>
-      <a href="/k/{{ record.access_key }}/plan" target="_blank">Public plan view</a>
+      <a href="{{ root_path }}/admin/sessions">All sessions</a>
+      <a href="{{ root_path }}/k/{{ record.access_key }}/plan" target="_blank">Public plan view</a>
     </nav>
     <p class="security-badge" aria-label="Secured">Your information is secured</p>
   </header>
@@ -27,7 +27,7 @@
       <p><strong>Excel:</strong> {{ record.excel_path or "—" }}</p>
       <p><strong>JSON:</strong> {{ record.json_path or "—" }}</p>
 
-      <form method="post" action="/admin/sessions/{{ record.id }}/update" class="grid-form mt">
+      <form method="post" action="{{ root_path }}/admin/sessions/{{ record.id }}/update" class="grid-form mt">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label>Company name <input type="text" name="company_name" value="{{ state.company.company_name }}"></label>
         <label>Products <input type="text" name="products" value="{{ state.company.products }}"></label>
@@ -36,16 +36,16 @@
         <button type="submit" class="btn">Save changes</button>
       </form>
 
-      <form method="post" action="/admin/sessions/{{ record.id }}/regenerate" class="mt">
+      <form method="post" action="{{ root_path }}/admin/sessions/{{ record.id }}/regenerate" class="mt">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit" class="btn primary">Regenerate documents</button>
       </form>
 
       {% if record.pdf_path %}
       <div class="download-actions mt">
-        <a href="/k/{{ record.access_key }}/documents/pdf" class="btn">Download PDF</a>
-        <a href="/k/{{ record.access_key }}/documents/xlsx" class="btn">Download Excel</a>
-        <a href="/k/{{ record.access_key }}/documents/json" class="btn">Download JSON</a>
+        <a href="{{ root_path }}/k/{{ record.access_key }}/documents/pdf" class="btn">Download PDF</a>
+        <a href="{{ root_path }}/k/{{ record.access_key }}/documents/xlsx" class="btn">Download Excel</a>
+        <a href="{{ root_path }}/k/{{ record.access_key }}/documents/json" class="btn">Download JSON</a>
       </div>
       {% endif %}
     </section>

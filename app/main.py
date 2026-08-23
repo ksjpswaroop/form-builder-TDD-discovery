@@ -76,7 +76,11 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="TDD Discovery Form", lifespan=lifespan)
+app = FastAPI(
+    title="TDD Discovery Form",
+    lifespan=lifespan,
+    root_path=settings.root_path or "",
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SecurityHeadersMiddleware)
@@ -107,14 +111,21 @@ def _get_by_key(db: Session, access_key: str):
         raise HTTPException(status_code=404, detail="Not found")
 
 
+def _url(path: str) -> str:
+    base = settings.root_path.rstrip("/")
+    if not path.startswith("/"):
+        path = f"/{path}"
+    return f"{base}{path}" if base else path
+
+
 def _ctx(access_key: str, **kwargs) -> dict:
-    return {"access_key": access_key, "base_path": f"/k/{access_key}", **kwargs}
+    return {"access_key": access_key, "base_path": _url(f"/k/{access_key}"), **kwargs}
 
 
 @app.get("/")
 def home(db: Session = Depends(get_db)):
     record, _ = create_session(db)
-    return RedirectResponse(url=f"/k/{record.access_key}/intake", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{record.access_key}/intake"), status_code=303)
 
 
 @app.get("/retrieve")
@@ -141,7 +152,7 @@ def retrieve_submit(
             {"error": "Not found. Check your key and try again.", "step": "retrieve"},
             status_code=400,
         )
-    return RedirectResponse(url=f"/k/{key}/intake", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{key}/intake"), status_code=303)
 
 
 @app.get("/k/{access_key}/intake")
@@ -194,7 +205,7 @@ def intake_submit(
         risk_tolerance=risk_tolerance,
     )
     save_session_state(db, record, state, step="objectives")
-    return RedirectResponse(url=f"/k/{access_key}/objectives", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/objectives"), status_code=303)
 
 
 @app.get("/k/{access_key}/objectives")
@@ -238,7 +249,7 @@ def objectives_submit(
         remediation_capacity=remediation_capacity,
     )
     save_session_state(db, record, state, step="applications")
-    return RedirectResponse(url=f"/k/{access_key}/applications", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/applications"), status_code=303)
 
 
 @app.get("/k/{access_key}/applications")
@@ -294,7 +305,7 @@ def applications_submit(
         )
     )
     save_session_state(db, record, state, step="applications")
-    return RedirectResponse(url=f"/k/{access_key}/applications", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/applications"), status_code=303)
 
 
 @app.post("/k/{access_key}/applications/done")
@@ -309,7 +320,7 @@ def applications_done(
     if not state.applications:
         raise HTTPException(status_code=400, detail="Add at least one application")
     save_session_state(db, record, state, step="interview")
-    return RedirectResponse(url=f"/k/{access_key}/interview", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/interview"), status_code=303)
 
 
 @app.get("/k/{access_key}/interview")
@@ -397,10 +408,10 @@ async def interview_submit(access_key: str, request: Request, db: Session = Depe
     if coverage.is_sufficient:
         state.plan_yaml = generate_plan_yaml(state)
         save_session_state(db, record, state, step="plan")
-        return RedirectResponse(url=f"/k/{access_key}/plan", status_code=303)
+        return RedirectResponse(url=_url(f"/k/{access_key}/plan"), status_code=303)
 
     save_session_state(db, record, state, step="interview")
-    return RedirectResponse(url=f"/k/{access_key}/interview", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/interview"), status_code=303)
 
 
 @app.post("/k/{access_key}/interview/generate-plan")
@@ -414,7 +425,7 @@ def interview_generate_plan(
     record, state = _get_by_key(db, access_key)
     state.plan_yaml = generate_plan_yaml(state)
     save_session_state(db, record, state, step="plan")
-    return RedirectResponse(url=f"/k/{access_key}/plan", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/plan"), status_code=303)
 
 
 @app.get("/k/{access_key}/plan")
@@ -464,7 +475,7 @@ def plan_approve(
     update_document_paths(db, record, export.pdf_path, export.excel_path, export.json_path)
 
     save_session_state(db, record, state, step="complete")
-    return RedirectResponse(url=f"/k/{access_key}/plan?approved=1", status_code=303)
+    return RedirectResponse(url=_url(f"/k/{access_key}/plan?approved=1"), status_code=303)
 
 
 @app.get("/k/{access_key}/documents/{format}")
@@ -496,7 +507,7 @@ def download_document(access_key: str, format: str, db: Session = Depends(get_db
 @app.get("/admin/login")
 def admin_login_page(request: Request):
     if is_admin_authenticated(request):
-        return RedirectResponse(url="/admin/sessions", status_code=303)
+        return RedirectResponse(url=_url("/admin/sessions"), status_code=303)
     return render_page(request, "admin/login.html", {"error": None, "step": "admin"})
 
 
@@ -516,7 +527,7 @@ def admin_login_submit(
             {"error": "Invalid credentials", "step": "admin"},
             status_code=401,
         )
-    response = RedirectResponse(url="/admin/sessions", status_code=303)
+    response = RedirectResponse(url=_url("/admin/sessions"), status_code=303)
     set_admin_cookie(response)
     return response
 
@@ -524,7 +535,7 @@ def admin_login_submit(
 @app.post("/admin/logout")
 def admin_logout(request: Request, csrf_token: str = Form(...)):
     validate_csrf(request, csrf_token)
-    response = RedirectResponse(url="/admin/login", status_code=303)
+    response = RedirectResponse(url=_url("/admin/login"), status_code=303)
     clear_admin_cookie(response)
     return response
 
@@ -568,7 +579,7 @@ def admin_session_update(
     if not state.plan_yaml:
         state.plan_yaml = generate_plan_yaml(state)
     save_session_state(db, record, state)
-    return RedirectResponse(url=f"/admin/sessions/{session_id}", status_code=303)
+    return RedirectResponse(url=_url(f"/admin/sessions/{session_id}"), status_code=303)
 
 
 @app.post("/admin/sessions/{session_id}/regenerate")
@@ -585,4 +596,4 @@ def admin_regenerate(
         state.plan_yaml = generate_plan_yaml(state)
     export = export_all(record, state, base_url=_base_url(request))
     update_document_paths(db, record, export.pdf_path, export.excel_path, export.json_path)
-    return RedirectResponse(url=f"/admin/sessions/{session_id}", status_code=303)
+    return RedirectResponse(url=_url(f"/admin/sessions/{session_id}"), status_code=303)

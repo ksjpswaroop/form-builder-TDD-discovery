@@ -24,7 +24,7 @@
     {% set field_key = q.question_id ~ '::' ~ (q.applies_to or '') %}
     <article class="question-card" id="q-{{ field_key | replace('::', '-') }}">
       <div class="question-header">
-        <img src="/static/graphics/{{ graphics.get(q.section, 'company.svg') }}" alt="" class="section-graphic" width="48" height="48">
+        <img src="{{ root_path }}/static/graphics/{{ graphics.get(q.section, 'company.svg') }}" alt="" class="section-graphic" width="48" height="48">
         <div>
           <span class="section-badge">{{ section_titles.get(q.section, q.section) }}</span>
           {% if q.applies_to %}<span class="app-badge">{{ q.applies_to }}</span>{% endif %}

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Discovery — {{ step if step is defined else 'Home' }}</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <script src="/static/js/htmx.min.js" defer></script>
+  <link rel="stylesheet" href="{{ root_path }}/static/css/style.css">
+  <script src="{{ root_path }}/static/js/htmx.min.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -18,7 +18,7 @@
       <a href="{{ base_path }}/interview" class="{{ 'active' if step == 'interview' }}">Interview</a>
       <a href="{{ base_path }}/plan" class="{{ 'active' if step == 'plan' }}">Plan</a>
       {% endif %}
-      <a href="/retrieve" class="nav-extra">Retrieve submission</a>
+      <a href="{{ root_path }}/retrieve" class="nav-extra">Retrieve submission</a>
     </nav>
     <p class="security-badge" aria-label="Secured">Your information is secured</p>
   </header>

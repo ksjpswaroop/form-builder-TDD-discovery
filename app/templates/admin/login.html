@@ -6,7 +6,7 @@
   {% if error %}
   <p class="error-banner">{{ error }}</p>
   {% endif %}
-  <form method="post" action="/admin/login">
+  <form method="post" action="{{ root_path }}/admin/login">
     {{ csrf_field() }}
     <label>Username <input type="text" name="username" required></label>
     <label>Password <input type="password" name="password" required></label>
